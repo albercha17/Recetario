@@ -389,147 +389,155 @@
       return [];
     }
 
+    const indexCatalog = extractIndexCatalog(body);
+    if (!indexCatalog.size) {
+      return [];
+    }
+
     const pendingImages = [];
-    const pages = splitDocumentIntoPages(body);
+    const segments = splitDocumentIntoPages(body).flat();
 
     const recipes = [];
-    let currentCategory = null;
-    let started = false;
+    let recipe = null;
+    let currentSection = null;
+    let readingMetadata = false;
+    let deferredImages = [];
+    let pendingTitleParts = [];
+    let pendingTitleImages = [];
+    let lastResolvedCategory = null;
 
-    pages.forEach((segments) => {
-      const marker = getPageMarker(segments);
-      const normalizedMarker = normalizeTitle(marker);
+    segments.forEach((segment) => {
+      const text = normalizeText(segment.text);
+      const hasText = Boolean(text);
+      const imageRefs = segment.imageRefs;
 
-      if (normalizedMarker === 'platos principales') {
-        currentCategory = 'principales';
-        started = true;
-        return;
+      if (!recipe && imageRefs.length) {
+        deferredImages.push(...imageRefs);
       }
 
-      if (normalizedMarker === 'postres') {
-        currentCategory = 'postres';
-        started = true;
-        return;
+      if (!recipe && pendingTitleParts.length && segment.style !== 'Title' && (hasText || imageRefs.length)) {
+        startRecipeFromPending();
       }
 
-      if (!started || !currentCategory) {
-        return;
-      }
+      if (segment.style === 'Title' && hasText) {
+        const lines = text.split('\n');
+        const titleCandidate = lines.shift() || '';
+        const trimmedTitle = titleCandidate.trim();
 
-      const recipe = buildRecipeFromSegments(segments, currentCategory);
-      if (recipe && isValidRecipe(recipe)) {
-        recipes.push(recipe);
-      }
-    });
+        if (!trimmedTitle) {
+          return;
+        }
 
-    await Promise.all(pendingImages);
+        const combinedParts = [...pendingTitleParts, trimmedTitle];
+        const match = resolveCategory(combinedParts) || resolveCategory([trimmedTitle]);
 
-    return recipes;
+        if (match && !shouldSkipTitle(match.title)) {
+          finalizeCurrentRecipe();
 
-    function buildRecipeFromSegments(segments, category) {
-      if (!category) {
-        return null;
-      }
-      let recipe = null;
-      let currentSection = null;
-      let readingMetadata = false;
-      const deferredImages = [];
-
-      segments.forEach((segment) => {
-        const text = normalizeText(segment.text);
-        const hasText = Boolean(text);
-        const imageRefs = segment.imageRefs;
-
-        if (!recipe) {
-          if (imageRefs.length) {
-            deferredImages.push(...imageRefs);
-          }
-
-          if (!hasText) {
-            return;
-          }
-
-          const lines = text.split('\n');
-          const titleCandidate = lines.shift() || '';
-          const normalizedCandidate = normalizeTitle(titleCandidate);
-
-          if (!normalizedCandidate || shouldSkipTitle(titleCandidate)) {
-            return;
-          }
-
-          const title = titleCandidate.trim() || 'Receta sin título';
+          const leftover = lines.join('\n').trim();
           recipe = {
-            title,
+            title: match.title || 'Receta sin título',
             metadata: [],
             sections: [],
             images: [],
-            category,
+            category: match.category,
           };
+          lastResolvedCategory = match.category;
+          currentSection = null;
+          readingMetadata = true;
 
-          const leftover = lines.join('\n').trim();
           if (leftover) {
             recipe.metadata.push(leftover);
           }
 
-          if (deferredImages.length) {
-            queueImages(recipe, deferredImages);
-            deferredImages.length = 0;
+          const combinedImages = [...deferredImages, ...pendingTitleImages];
+          if (combinedImages.length) {
+            queueImages(recipe, combinedImages);
           }
+
+          deferredImages = [];
+          pendingTitleParts = [];
+          pendingTitleImages = [];
 
           if (imageRefs.length) {
             queueImages(recipe, imageRefs);
           }
 
-          readingMetadata = true;
-          currentSection = null;
           return;
         }
 
+        if (recipe) {
+          finalizeCurrentRecipe();
+        }
+
+        pendingTitleParts = combinedParts.filter(Boolean);
         if (imageRefs.length) {
-          queueImages(recipe, imageRefs);
+          pendingTitleImages.push(...imageRefs);
         }
+        deferredImages = [];
+        return;
+      }
 
-        if (!hasText) {
-          return;
-        }
+      if (!recipe && pendingTitleParts.length && (hasText || imageRefs.length)) {
+        startRecipeFromPending();
+      }
 
-        if (segment.style && segment.style.startsWith('Heading')) {
-          currentSection = {
-            title: text,
-            content: [],
-          };
-          recipe.sections.push(currentSection);
-          readingMetadata = false;
-          return;
-        }
+      if (!recipe) {
+        return;
+      }
 
-        if (readingMetadata) {
-          recipe.metadata.push(text);
-          return;
-        }
+      if (imageRefs.length) {
+        queueImages(recipe, imageRefs);
+      }
 
-        if (!currentSection) {
-          currentSection = {
-            title: '',
-            content: [],
-          };
-          recipe.sections.push(currentSection);
-        }
+      if (!hasText) {
+        return;
+      }
 
-        if (segment.numbered) {
-          const last = currentSection.content[currentSection.content.length - 1];
-          if (last && last.type === 'list') {
-            last.items.push(text);
-          } else {
-            currentSection.content.push({ type: 'list', items: [text] });
-          }
+      if (segment.style && segment.style.startsWith('Heading')) {
+        currentSection = {
+          title: text,
+          content: [],
+        };
+        recipe.sections.push(currentSection);
+        readingMetadata = false;
+        return;
+      }
+
+      if (readingMetadata) {
+        recipe.metadata.push(text);
+        return;
+      }
+
+      if (!currentSection) {
+        currentSection = {
+          title: '',
+          content: [],
+        };
+        recipe.sections.push(currentSection);
+      }
+
+      if (segment.numbered) {
+        const last = currentSection.content[currentSection.content.length - 1];
+        if (last && last.type === 'list') {
+          last.items.push(text);
         } else {
-          currentSection.content.push({ type: 'paragraph', text });
+          currentSection.content.push({ type: 'list', items: [text] });
         }
-      });
+      } else {
+        currentSection.content.push({ type: 'paragraph', text });
+      }
+    });
 
-      return recipe;
+    if (!recipe && pendingTitleParts.length) {
+      startRecipeFromPending();
     }
+
+    finalizeCurrentRecipe();
+
+    await Promise.all(pendingImages);
+
+    return recipes;
 
     function queueImages(recipe, references) {
       const uniqueRefs = Array.from(new Set(references));
@@ -541,6 +549,93 @@
         });
         pendingImages.push(promise);
       });
+    }
+
+    function finalizeCurrentRecipe() {
+      if (recipe && isValidRecipe(recipe)) {
+        recipes.push(recipe);
+      }
+      recipe = null;
+      currentSection = null;
+      readingMetadata = false;
+      deferredImages = [];
+      pendingTitleImages = [];
+    }
+
+    function startRecipeFromPending() {
+      if (!pendingTitleParts.length) {
+        return;
+      }
+      const combinedTitle = pendingTitleParts.join(' ').trim();
+      if (!combinedTitle) {
+        pendingTitleParts = [];
+        pendingTitleImages = [];
+        return;
+      }
+
+      const match = resolveCategory(pendingTitleParts);
+      const category = match ? match.category : lastResolvedCategory || 'principales';
+      const title = match && match.title ? match.title : combinedTitle;
+
+      recipe = {
+        title: title || 'Receta sin título',
+        metadata: [],
+        sections: [],
+        images: [],
+        category,
+      };
+
+      if (match) {
+        lastResolvedCategory = match.category;
+      } else {
+        lastResolvedCategory = category;
+      }
+
+      currentSection = null;
+      readingMetadata = true;
+
+      const combinedImages = [...deferredImages, ...pendingTitleImages];
+      if (combinedImages.length) {
+        queueImages(recipe, combinedImages);
+      }
+
+      deferredImages = [];
+      pendingTitleParts = [];
+      pendingTitleImages = [];
+    }
+
+    function resolveCategory(parts) {
+      const title = parts.join(' ').trim();
+      if (!title) {
+        return null;
+      }
+      const normalized = normalizeTitle(title);
+      if (!normalized) {
+        return null;
+      }
+
+      if (indexCatalog.has(normalized)) {
+        return { category: indexCatalog.get(normalized), title };
+      }
+
+      let candidate = null;
+      let ambiguous = false;
+      indexCatalog.forEach((category, key) => {
+        if (key.startsWith(normalized) || normalized.startsWith(key)) {
+          if (candidate && candidate.category !== category) {
+            ambiguous = true;
+          }
+          if (!candidate) {
+            candidate = { category, title };
+          }
+        }
+      });
+
+      if (ambiguous) {
+        return null;
+      }
+
+      return candidate;
     }
   }
 
@@ -592,6 +687,81 @@
     });
 
     return pages.filter((page) => page.length);
+  }
+
+  function extractIndexCatalog(body) {
+    const catalog = new Map();
+    const paragraphs = Array.from(body.getElementsByTagNameNS(WORD_NS, 'p'));
+    let inIndex = false;
+    let currentCategory = null;
+
+    for (const paragraph of paragraphs) {
+      const text = normalizeText(getParagraphText(paragraph));
+      if (!text) {
+        continue;
+      }
+
+      const style = getParagraphStyle(paragraph);
+      const normalized = normalizeTitle(text);
+
+      if (!inIndex) {
+        if (normalized === 'indice') {
+          inIndex = true;
+        }
+        continue;
+      }
+
+      if (style === 'Title' && normalized && normalized !== 'indice') {
+        break;
+      }
+
+      if (normalized === 'platos principales') {
+        currentCategory = 'principales';
+        continue;
+      }
+
+      if (normalized === 'postres') {
+        currentCategory = 'postres';
+        continue;
+      }
+
+      if (!currentCategory || !normalized || shouldSkipTitle(text)) {
+        continue;
+      }
+
+      if (!catalog.has(normalized)) {
+        catalog.set(normalized, currentCategory);
+      }
+    }
+
+    return catalog;
+  }
+
+  function getParagraphText(paragraph) {
+    const parts = [];
+    paragraph.childNodes.forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+
+      if (node.namespaceURI === WORD_NS && node.localName === 'r') {
+        node.childNodes.forEach((child) => {
+          if (child.nodeType !== Node.ELEMENT_NODE) {
+            return;
+          }
+
+          if (child.namespaceURI === WORD_NS && child.localName === 't') {
+            parts.push(child.textContent || '');
+          } else if (child.namespaceURI === WORD_NS && child.localName === 'tab') {
+            parts.push('\t');
+          } else if (child.namespaceURI === WORD_NS && child.localName === 'br') {
+            parts.push('\n');
+          }
+        });
+      }
+    });
+
+    return parts.join('');
   }
 
   function splitParagraphIntoSegments(paragraph) {
@@ -808,18 +978,6 @@
     }
     const hasSections = recipe.sections.some((section) => section.content.length > 0);
     return hasSections;
-  }
-
-  function getPageMarker(segments) {
-    for (const segment of segments) {
-      if (segment && segment.text) {
-        const text = normalizeText(segment.text);
-        if (text) {
-          return text.split('\n')[0];
-        }
-      }
-    }
-    return '';
   }
 
   function shouldSkipTitle(title) {
