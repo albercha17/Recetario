@@ -22,6 +22,13 @@
   const modalSections = document.getElementById('modal-sections');
   const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
 
+  const CATEGORY_MARKERS = {
+    'plato principal': 'principales',
+    'platos principales': 'principales',
+    postre: 'postres',
+    postres: 'postres',
+  };
+
   const state = {
     recipes: [],
     filtered: [],
@@ -390,9 +397,6 @@
     }
 
     const indexCatalog = extractIndexCatalog(body);
-    if (!indexCatalog.size) {
-      return [];
-    }
 
     const pendingImages = [];
     const segments = splitDocumentIntoPages(body).flat();
@@ -482,6 +486,15 @@
         startRecipeFromPending();
       }
 
+      const markerCategory = hasText ? detectCategoryMarker(text) : null;
+      if (markerCategory) {
+        lastResolvedCategory = markerCategory;
+        if (recipe) {
+          recipe.category = markerCategory;
+        }
+        return;
+      }
+
       if (!recipe) {
         return;
       }
@@ -505,6 +518,12 @@
       }
 
       if (readingMetadata) {
+        const metadataMarker = detectCategoryMarker(text);
+        if (metadataMarker) {
+          lastResolvedCategory = metadataMarker;
+          recipe.category = metadataMarker;
+          return;
+        }
         recipe.metadata.push(text);
         return;
       }
@@ -950,6 +969,14 @@
       .map((line) => line.replace(/\s+/g, ' ').trim())
       .filter(Boolean)
       .join('\n');
+  }
+
+  function detectCategoryMarker(text) {
+    const normalized = normalizeTitle(text);
+    if (!normalized) {
+      return null;
+    }
+    return CATEGORY_MARKERS[normalized] || null;
   }
 
   function getParagraphStyle(paragraph) {
