@@ -33,8 +33,14 @@
             />
           </label>
           <div class="filter-group" role="group" aria-label="Filtrar por tipo de receta">
-            <button type="button" class="filter-button is-active" data-filter="principales">Principales</button>
-            <button type="button" class="filter-button" data-filter="postres">Postres</button>
+            <button type="button" class="filter-button is-active" data-filter="principales">
+              <span class="filter-button__label">Principales</span>
+              <span class="filter-button__count" data-count="principales">0</span>
+            </button>
+            <button type="button" class="filter-button" data-filter="postres">
+              <span class="filter-button__label">Postres</span>
+              <span class="filter-button__count" data-count="postres">0</span>
+            </button>
           </div>
         </div>
       </header>
@@ -48,6 +54,9 @@
           <h2 id="empty-state-title"></h2>
           <p id="empty-state-message"></p>
         </section>
+        <header class="category-header">
+          <h2 id="category-heading" class="category-heading">Platos principales · 0 recetas</h2>
+        </header>
         <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
       </main>
     </div>

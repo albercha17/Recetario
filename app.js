@@ -10,6 +10,11 @@
   const emptyMessage = document.getElementById('empty-state-message');
   const searchInput = document.getElementById('search');
   const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+  const countBadges = {
+    principales: document.querySelector('[data-count="principales"]'),
+    postres: document.querySelector('[data-count="postres"]'),
+  };
+  const categoryHeading = document.getElementById('category-heading');
   const modal = document.getElementById('modal');
   const modalGallery = document.getElementById('modal-gallery');
   const modalTitle = document.getElementById('modal-title');
@@ -21,6 +26,10 @@
     recipes: [],
     filtered: [],
     activeCategory: 'principales',
+    counts: {
+      principales: 0,
+      postres: 0,
+    },
   };
 
   let lastFocusedElement = null;
@@ -31,6 +40,7 @@
     try {
       const recipes = await loadRecipes();
       state.recipes = recipes;
+      updateCounts();
       applyFilters();
     } catch (error) {
       console.error('No se pudieron cargar las recetas', error);
@@ -93,7 +103,9 @@
 
   function applyFilters() {
     if (!state.recipes.length) {
+      state.filtered = [];
       renderCards([]);
+      updateCategoryHeading();
       setEmptyState({
         visible: true,
         title: 'No se encontraron recetas',
@@ -114,6 +126,7 @@
 
     state.filtered = filtered;
     renderCards(filtered);
+    updateCategoryHeading();
 
     if (!filtered.length) {
       const categoryLabel = state.activeCategory === 'postres' ? 'postres' : 'platos principales';
@@ -128,6 +141,55 @@
     } else {
       setEmptyState({ visible: false });
     }
+  }
+
+  function updateCounts() {
+    const totals = {
+      principales: 0,
+      postres: 0,
+    };
+
+    state.recipes.forEach((recipe) => {
+      if (recipe.category === 'postres') {
+        totals.postres += 1;
+      } else {
+        totals.principales += 1;
+      }
+    });
+
+    state.counts = totals;
+
+    Object.entries(countBadges).forEach(([category, element]) => {
+      if (element instanceof HTMLElement) {
+        element.textContent = String(totals[category] ?? 0);
+      }
+    });
+  }
+
+  function updateCategoryHeading() {
+    if (!(categoryHeading instanceof HTMLElement)) {
+      return;
+    }
+
+    const label = state.activeCategory === 'postres' ? 'Postres' : 'Platos principales';
+    const total = state.counts[state.activeCategory] ?? 0;
+    const filteredCount = state.filtered.length;
+    const hasSearch = Boolean(searchInput.value.trim());
+
+    if (!state.recipes.length) {
+      categoryHeading.textContent = `${label} · 0 recetas`;
+      return;
+    }
+
+    if (hasSearch && filteredCount !== total) {
+      const filteredLabel = filteredCount === 1 ? '1 receta' : `${filteredCount} recetas`;
+      const totalLabel = total === 1 ? '1 receta en total' : `${total} recetas en total`;
+      categoryHeading.textContent = `${label} · ${filteredLabel} (${totalLabel})`;
+      return;
+    }
+
+    const recipeLabel = total === 1 ? '1 receta' : `${total} recetas`;
+    categoryHeading.textContent = `${label} · ${recipeLabel}`;
   }
 
   async function loadRecipes() {
@@ -327,20 +389,47 @@
       return [];
     }
 
-    const categoryMap = extractCategoriesFromIndex(body);
     const pendingImages = [];
     const pages = splitDocumentIntoPages(body);
 
-    const recipes = pages
-      .map((segments) => buildRecipeFromSegments(segments))
-      .filter(Boolean)
-      .filter(isValidRecipe);
+    const recipes = [];
+    let currentCategory = null;
+    let started = false;
+
+    pages.forEach((segments) => {
+      const marker = getPageMarker(segments);
+      const normalizedMarker = normalizeTitle(marker);
+
+      if (normalizedMarker === 'platos principales') {
+        currentCategory = 'principales';
+        started = true;
+        return;
+      }
+
+      if (normalizedMarker === 'postres') {
+        currentCategory = 'postres';
+        started = true;
+        return;
+      }
+
+      if (!started || !currentCategory) {
+        return;
+      }
+
+      const recipe = buildRecipeFromSegments(segments, currentCategory);
+      if (recipe && isValidRecipe(recipe)) {
+        recipes.push(recipe);
+      }
+    });
 
     await Promise.all(pendingImages);
 
     return recipes;
 
-    function buildRecipeFromSegments(segments) {
+    function buildRecipeFromSegments(segments, category) {
+      if (!category) {
+        return null;
+      }
       let recipe = null;
       let currentSection = null;
       let readingMetadata = false;
@@ -369,8 +458,6 @@
           }
 
           const title = titleCandidate.trim() || 'Receta sin título';
-          const category = categoryMap.get(normalizedCandidate) || 'principales';
-
           recipe = {
             title,
             metadata: [],
@@ -601,58 +688,6 @@
     return segments;
   }
 
-  function extractCategoriesFromIndex(body) {
-    const map = new Map();
-    let currentCategory = null;
-
-    const paragraphs = Array.from(body.getElementsByTagNameNS(WORD_NS, 'p'));
-
-    for (const paragraph of paragraphs) {
-      const raw = extractParagraphText(paragraph);
-      const text = normalizeText(raw);
-      if (!text) {
-        continue;
-      }
-
-      const normalized = text.toLowerCase();
-
-      if (normalized === 'platos principales') {
-        currentCategory = 'principales';
-        continue;
-      }
-
-      if (normalized === 'postres') {
-        currentCategory = 'postres';
-        continue;
-      }
-
-      if (normalized.startsWith('tiempo de preparación') || normalized.startsWith('tiempo de preparacion')) {
-        break;
-      }
-
-      if (!currentCategory) {
-        continue;
-      }
-
-      if (shouldSkipTitle(text)) {
-        continue;
-      }
-
-      const normalizedTitle = normalizeTitle(text);
-      if (!normalizedTitle) {
-        continue;
-      }
-
-      if (map.has(normalizedTitle)) {
-        break;
-      }
-
-      map.set(normalizedTitle, currentCategory);
-    }
-
-    return map;
-  }
-
   function buildRelationshipsMap(relsDom) {
     const map = new Map();
     const relationships = Array.from(relsDom.getElementsByTagName('Relationship'));
@@ -723,37 +758,6 @@
     }
   }
 
-  function extractParagraphText(paragraph) {
-    const parts = [];
-
-    paragraph.childNodes.forEach((node) => {
-      if (node.nodeType !== Node.ELEMENT_NODE) {
-        return;
-      }
-      if (node.namespaceURI === WORD_NS && node.localName === 'r') {
-        node.childNodes.forEach((child) => {
-          if (child.nodeType !== Node.ELEMENT_NODE) {
-            return;
-          }
-          if (child.namespaceURI === WORD_NS && child.localName === 't') {
-            parts.push(child.textContent || '');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'tab') {
-            parts.push('\t');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'br') {
-            const type = child.getAttributeNS(WORD_NS, 'type') || child.getAttribute('w:type') || '';
-            if (type.toLowerCase() !== 'page') {
-              parts.push('\n');
-            }
-          }
-        });
-      } else if (node.namespaceURI === WORD_NS && node.localName === 'br') {
-        parts.push('\n');
-      }
-    });
-
-    return parts.join('');
-  }
-
   function extractImageIdsFromRun(run) {
     const ids = [];
     const blips = run.getElementsByTagNameNS(DRAWING_NS, 'blip');
@@ -804,6 +808,18 @@
     }
     const hasSections = recipe.sections.some((section) => section.content.length > 0);
     return hasSections;
+  }
+
+  function getPageMarker(segments) {
+    for (const segment of segments) {
+      if (segment && segment.text) {
+        const text = normalizeText(segment.text);
+        if (text) {
+          return text.split('\n')[0];
+        }
+      }
+    }
+    return '';
   }
 
   function shouldSkipTitle(title) {
