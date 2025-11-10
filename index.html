@@ -11,15 +11,11 @@
   <body>
     <div class="app-shell">
       <header class="app-header">
-        <div class="header__content">
-          <div class="header__intro">
-            <p class="tag">Recetario</p>
-            <h1>Descubre tus recetas favoritas</h1>
-            <p class="subtitle">
-              Todas las recetas del documento se cargan automáticamente. Busca por nombre y
-              toca cualquier tarjeta para ver los detalles completos.
-            </p>
-          </div>
+        <div class="header__brand">
+          <span class="logo">Recetario</span>
+          <p class="tagline">Tus recetas siempre contigo</p>
+        </div>
+        <div class="header__actions">
           <label class="search" for="search">
             <span class="sr-only">Buscar receta por nombre</span>
             <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
@@ -36,6 +32,10 @@
               autocomplete="off"
             />
           </label>
+          <div class="filter-group" role="group" aria-label="Filtrar por tipo de receta">
+            <button type="button" class="filter-button is-active" data-filter="principales">Principales</button>
+            <button type="button" class="filter-button" data-filter="postres">Postres</button>
+          </div>
         </div>
       </header>
       <main class="content" aria-live="polite">

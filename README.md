@@ -1,33 +1,32 @@
 # Recetario interactivo
 
-Aplicación web ligera para consultar el `recetario.docx` desde el navegador del iPhone. El backend lee el documento de Word en cada petición (con caché por fecha de modificación) y expone los datos y las imágenes en formato JSON; la interfaz web permite buscar recetas por nombre, ingredientes o pasos.
+Aplicación estática que lee el contenido de `recetario.docx` directamente en el navegador y muestra un catálogo moderno de recetas optimizado para iPhone. No es necesario ejecutar ningún servidor: basta con publicar la carpeta en GitHub Pages (por ejemplo en `https://albercha17.github.io/Recetario/`) o abrir `index.html` en el navegador.
 
-## Requisitos
+## ¿Cómo funciona?
 
-- Python 3.11 o superior (incluye las dependencias utilizadas).
+- Al cargar la página se descarga `recetario.docx`, se descomprime en el navegador y se analizan los títulos, secciones e imágenes para generar las fichas.
+- Cada tarjeta muestra únicamente la fotografía (si existe) y el nombre de la receta. Al tocarla se abre un panel con ingredientes, preparación, consejos y tiempos.
+- El buscador filtra en tiempo real por nombre de receta.
+- Cada vez que actualices el documento Word y publiques los cambios en GitHub, la web mostrará automáticamente la nueva información.
 
-## Puesta en marcha
+## Publicación en GitHub Pages
 
-```bash
-python server.py --host 0.0.0.0 --port 8000
-```
+1. Sube todos los archivos del repositorio (incluido `recetario.docx`) a la rama que GitHub Pages tenga configurada.
+2. Abre la URL de GitHub Pages para ver el recetario actualizado. El navegador se encargará de cargar los últimos cambios del Word.
 
-La aplicación quedará disponible en [http://localhost:8000](http://localhost:8000). Para usarla en el iPhone conectado a la misma red, sustituye `localhost` por la IP de tu ordenador.
+## Desarrollo local
 
-### Actualización automática tras editar el Word
-
-El servidor comprueba la fecha de modificación de `recetario.docx` en cada petición. Cada vez que guardes cambios en el archivo, vuelve a cargar la página o pulsa buscar para obtener las recetas actualizadas sin reiniciar el servidor.
+Simplemente abre `index.html` en tu navegador (puedes arrastrarlo y soltarlo). Al tratarse de un fichero local, algunos navegadores bloquean las peticiones `fetch` a archivos del sistema de ficheros. Si ocurre, sirve la carpeta con cualquier servidor estático (`python -m http.server`, `npx serve`, etc.) para pruebas puntuales.
 
 ## Estructura del proyecto
 
-- `recetario.docx`: documento fuente con las recetas e imágenes.
-- `server.py`: servidor HTTP que sirve la SPA y el endpoint JSON.
-- `app/parser.py`: parser XML que transforma el DOCX en datos estructurados.
-- `app/repository.py`: caché en memoria que invalida cuando cambia el DOCX.
-- `public/`: activos estáticos de la interfaz (HTML, CSS y JavaScript).
+- `recetario.docx`: documento fuente con recetas e imágenes.
+- `index.html`: página principal y punto de entrada.
+- `styles.css`: estilos del recetario.
+- `app.js`: lógica que analiza el DOCX en el cliente, construye el buscador y la interfaz interactiva.
 
-## Personalización
+## Personalización rápida
 
-- Los estilos están pensados para móviles (layout responsive y soporte para modo oscuro).
-- El buscador elimina tildes para facilitar las coincidencias.
-- Si prefieres regenerar archivos estáticos en lugar de usar un servidor dinámico, puedes reutilizar `DocxRecipeParser` para generar un JSON y servirlo en cualquier entorno.
+- Edita `styles.css` para cambiar colores, tipografías o el diseño de las tarjetas.
+- El modal de detalles está en `index.html`; puedes añadir secciones extras o enlaces.
+- Si el documento DOCX utiliza otros estilos (p. ej. títulos distintos a "Heading 1"), ajusta el parser en `app.js` para reconocerlos.
