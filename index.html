@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recetario familiar</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="header__brand">
+          <span class="logo">Recetario</span>
+          <p class="tagline">Tus recetas siempre contigo</p>
+        </div>
+        <div class="header__actions">
+          <label class="search" for="search">
+            <span class="sr-only">Buscar receta por nombre</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
+              <path
+                d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 4.99L20.49 19zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"
+                fill="currentColor"
+              ></path>
+            </svg>
+            <input
+              id="search"
+              type="search"
+              name="search"
+              placeholder="Buscar por nombre"
+              autocomplete="off"
+            />
+          </label>
+          <div class="filter-group" role="group" aria-label="Filtrar por tipo de receta">
+            <button type="button" class="filter-button is-active" data-filter="principales">
+              <span class="filter-button__label">Principales</span>
+              <span class="filter-button__count" data-count="principales">0</span>
+            </button>
+            <button type="button" class="filter-button" data-filter="postres">
+              <span class="filter-button__label">Postres</span>
+              <span class="filter-button__count" data-count="postres">0</span>
+            </button>
+          </div>
+        </div>
+      </header>
+      <main class="content" aria-live="polite">
+        <section id="loader" class="loader" role="status">
+          <span class="loader__spinner" aria-hidden="true"></span>
+          <span class="loader__text">Cargando recetas…</span>
+        </section>
+        <section id="empty-state" class="empty-state" hidden>
+          <div class="empty-state__icon" aria-hidden="true">🍽️</div>
+          <h2 id="empty-state-title"></h2>
+          <p id="empty-state-message"></p>
+        </section>
+        <header class="category-header">
+          <h2 id="category-heading" class="category-heading">Platos principales · 0 recetas</h2>
+        </header>
+        <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
+      </main>
+    </div>
+    <div id="modal" class="modal hidden" aria-hidden="true">
+      <div class="modal__backdrop" data-dismiss="modal"></div>
+      <article class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button type="button" class="modal__close" aria-label="Cerrar detalles" data-dismiss="modal">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7a1 1 0 1 0-1.41 1.42L10.59 12l-4.89 4.88a1 1 0 1 0 1.41 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.41L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </button>
+        <div class="modal__body">
+          <div id="modal-gallery" class="modal__gallery" aria-label="Imágenes de la receta"></div>
+          <div class="modal__content">
+            <h2 id="modal-title"></h2>
+            <ul id="modal-meta" class="metadata"></ul>
+            <div id="modal-sections" class="sections"></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </body>
+</html>
