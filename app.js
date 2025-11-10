@@ -9,7 +9,6 @@
   const emptyTitle = document.getElementById('empty-state-title');
   const emptyMessage = document.getElementById('empty-state-message');
   const searchInput = document.getElementById('search');
-  const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
   const modal = document.getElementById('modal');
   const modalGallery = document.getElementById('modal-gallery');
   const modalTitle = document.getElementById('modal-title');
@@ -20,7 +19,6 @@
   const state = {
     recipes: [],
     filtered: [],
-    activeCategory: 'principales',
   };
 
   let lastFocusedElement = null;
@@ -31,7 +29,16 @@
     try {
       const recipes = await loadRecipes();
       state.recipes = recipes;
-      applyFilters();
+      state.filtered = recipes;
+      renderCards(recipes);
+      if (!recipes.length) {
+        setEmptyState({
+          visible: true,
+          title: 'No se encontraron recetas',
+          message:
+            'Añade contenido al archivo recetario.docx y vuelve a publicar la página para ver las recetas aquí.',
+        });
+      }
     } catch (error) {
       console.error('No se pudieron cargar las recetas', error);
       setEmptyState({
@@ -44,9 +51,7 @@
       loader.hidden = true;
     }
 
-    updateFilterButtons();
     searchInput.addEventListener('input', handleSearch);
-    filterButtons.forEach((button) => button.addEventListener('click', handleCategoryChange));
     dismissButtons.forEach((button) => button.addEventListener('click', closeModal));
     modal.addEventListener('click', (event) => {
       if (event.target instanceof HTMLElement && event.target.dataset.dismiss === 'modal') {
@@ -60,70 +65,24 @@
     });
   }
 
-  function handleSearch() {
+  function handleSearch(event) {
+    const query = event.target.value.trim().toLowerCase();
     if (!state.recipes.length) {
       return;
     }
-    applyFilters();
-  }
 
-  function handleCategoryChange(event) {
-    const button = event.currentTarget;
-    if (!(button instanceof HTMLButtonElement)) {
-      return;
-    }
-
-    const category = button.dataset.filter;
-    if (!category || category === state.activeCategory) {
-      return;
-    }
-
-    state.activeCategory = category;
-    updateFilterButtons();
-    applyFilters();
-  }
-
-  function updateFilterButtons() {
-    filterButtons.forEach((button) => {
-      if (button instanceof HTMLButtonElement) {
-        button.classList.toggle('is-active', button.dataset.filter === state.activeCategory);
-      }
-    });
-  }
-
-  function applyFilters() {
-    if (!state.recipes.length) {
-      renderCards([]);
-      setEmptyState({
-        visible: true,
-        title: 'No se encontraron recetas',
-        message:
-          'Añade contenido al archivo recetario.docx y vuelve a publicar la página para ver los resultados aquí.',
-      });
-      return;
-    }
-
-    const query = searchInput.value.trim();
-    const normalizedQuery = normalizeTitle(query);
-
-    let filtered = state.recipes.filter((recipe) => recipe.category === state.activeCategory);
-
-    if (normalizedQuery) {
-      filtered = filtered.filter((recipe) => normalizeTitle(recipe.title).includes(normalizedQuery));
-    }
+    const filtered = !query
+      ? state.recipes.slice()
+      : state.recipes.filter((recipe) => recipe.title.toLowerCase().includes(query));
 
     state.filtered = filtered;
     renderCards(filtered);
 
     if (!filtered.length) {
-      const categoryLabel = state.activeCategory === 'postres' ? 'postres' : 'platos principales';
-      const message = query
-        ? `No hay recetas de ${categoryLabel} que coincidan con “${query}”.`
-        : `No hay recetas registradas dentro de ${categoryLabel}.`;
       setEmptyState({
         visible: true,
         title: 'Sin resultados',
-        message,
+        message: `No hay recetas que coincidan con “${query}”.`,
       });
     } else {
       setEmptyState({ visible: false });
@@ -173,7 +132,6 @@
     card.type = 'button';
     card.className = 'recipe-card';
     card.dataset.hasImage = recipe.images.length ? 'true' : 'false';
-    card.dataset.category = recipe.category;
     card.setAttribute('aria-label', `Ver detalles de ${recipe.title}`);
 
     const image = document.createElement('div');
@@ -327,121 +285,104 @@
       return [];
     }
 
-    const categoryMap = extractCategoriesFromIndex(body);
+    const recipes = [];
+    let currentRecipe = null;
+    let currentSection = null;
+    let readingMetadata = false;
     const pendingImages = [];
-    const pages = splitDocumentIntoPages(body);
 
-    const recipes = pages
-      .map((segments) => buildRecipeFromSegments(segments))
-      .filter(Boolean)
-      .filter(isValidRecipe);
+    const children = Array.from(body.childNodes).filter((node) => node.nodeType === Node.ELEMENT_NODE);
+
+    for (const node of children) {
+      if (node.namespaceURI !== WORD_NS) {
+        continue;
+      }
+
+      if (node.localName === 'p') {
+        processParagraph(node);
+      } else if (node.localName === 'tbl') {
+        const paragraphs = Array.from(node.getElementsByTagNameNS(WORD_NS, 'p'));
+        paragraphs.forEach((paragraph) => processParagraph(paragraph));
+      }
+    }
 
     await Promise.all(pendingImages);
 
-    return recipes;
+    return recipes.filter(isValidRecipe);
 
-    function buildRecipeFromSegments(segments) {
-      let recipe = null;
-      let currentSection = null;
-      let readingMetadata = false;
-      const deferredImages = [];
+    function processParagraph(paragraph) {
+      const rawText = extractParagraphText(paragraph);
+      const text = normalizeText(rawText);
+      const style = getParagraphStyle(paragraph);
+      const imageRefs = extractImageIds(paragraph);
+      const hasText = Boolean(text);
 
-      segments.forEach((segment) => {
-        const text = normalizeText(segment.text);
-        const hasText = Boolean(text);
-        const imageRefs = segment.imageRefs;
-
-        if (!recipe) {
-          if (imageRefs.length) {
-            deferredImages.push(...imageRefs);
-          }
-
-          if (!hasText) {
-            return;
-          }
-
-          const lines = text.split('\n');
-          const titleCandidate = lines.shift() || '';
-          const normalizedCandidate = normalizeTitle(titleCandidate);
-
-          if (!normalizedCandidate || shouldSkipTitle(titleCandidate)) {
-            return;
-          }
-
-          const title = titleCandidate.trim() || 'Receta sin título';
-          const category = categoryMap.get(normalizedCandidate) || 'principales';
-
-          recipe = {
-            title,
-            metadata: [],
-            sections: [],
-            images: [],
-            category,
-          };
-
-          const leftover = lines.join('\n').trim();
-          if (leftover) {
-            recipe.metadata.push(leftover);
-          }
-
-          if (deferredImages.length) {
-            queueImages(recipe, deferredImages);
-            deferredImages.length = 0;
-          }
-
-          if (imageRefs.length) {
-            queueImages(recipe, imageRefs);
-          }
-
-          readingMetadata = true;
+      if (style === 'Title' && hasText) {
+        if (shouldSkipTitle(text)) {
+          currentRecipe = null;
           currentSection = null;
-          return;
-        }
-
-        if (imageRefs.length) {
-          queueImages(recipe, imageRefs);
-        }
-
-        if (!hasText) {
-          return;
-        }
-
-        if (segment.style && segment.style.startsWith('Heading')) {
-          currentSection = {
-            title: text,
-            content: [],
-          };
-          recipe.sections.push(currentSection);
           readingMetadata = false;
           return;
         }
+        const recipe = {
+          title: text,
+          metadata: [],
+          sections: [],
+          images: [],
+        };
+        recipes.push(recipe);
+        currentRecipe = recipe;
+        currentSection = null;
+        readingMetadata = true;
+        queueImages(recipe, imageRefs);
+        return;
+      }
 
-        if (readingMetadata) {
-          recipe.metadata.push(text);
-          return;
-        }
+      if (!currentRecipe) {
+        return;
+      }
 
-        if (!currentSection) {
-          currentSection = {
-            title: '',
-            content: [],
-          };
-          recipe.sections.push(currentSection);
-        }
+      if (imageRefs.length) {
+        queueImages(currentRecipe, imageRefs);
+      }
 
-        if (segment.numbered) {
-          const last = currentSection.content[currentSection.content.length - 1];
-          if (last && last.type === 'list') {
-            last.items.push(text);
-          } else {
-            currentSection.content.push({ type: 'list', items: [text] });
-          }
+      if (!hasText) {
+        return;
+      }
+
+      if (style && style.startsWith('Heading')) {
+        currentSection = {
+          title: text,
+          content: [],
+        };
+        currentRecipe.sections.push(currentSection);
+        readingMetadata = false;
+        return;
+      }
+
+      if (readingMetadata) {
+        currentRecipe.metadata.push(text);
+        return;
+      }
+
+      if (!currentSection) {
+        currentSection = {
+          title: '',
+          content: [],
+        };
+        currentRecipe.sections.push(currentSection);
+      }
+
+      if (hasNumbering(paragraph)) {
+        const last = currentSection.content[currentSection.content.length - 1];
+        if (last && last.type === 'list') {
+          last.items.push(text);
         } else {
-          currentSection.content.push({ type: 'paragraph', text });
+          currentSection.content.push({ type: 'list', items: [text] });
         }
-      });
-
-      return recipe;
+      } else {
+        currentSection.content.push({ type: 'paragraph', text });
+      }
     }
 
     function queueImages(recipe, references) {
@@ -455,178 +396,6 @@
         pendingImages.push(promise);
       });
     }
-  }
-
-  function splitDocumentIntoPages(body) {
-    const pages = [[]];
-    const children = Array.from(body.childNodes).filter((node) => node.nodeType === Node.ELEMENT_NODE);
-
-    children.forEach((node) => {
-      if (node.namespaceURI !== WORD_NS) {
-        return;
-      }
-
-      if (node.localName === 'p') {
-        const segments = splitParagraphIntoSegments(node);
-        segments.forEach((segment) => {
-          if (segment.pageBreakBefore) {
-            pages.push([]);
-          }
-
-          const currentPage = pages[pages.length - 1];
-          currentPage.push(segment);
-        });
-      } else if (node.localName === 'tbl') {
-        const paragraphs = Array.from(node.getElementsByTagNameNS(WORD_NS, 'p'));
-        paragraphs.forEach((paragraph) => {
-          const segments = splitParagraphIntoSegments(paragraph);
-          segments.forEach((segment) => {
-            if (segment.pageBreakBefore) {
-              pages.push([]);
-            }
-            pages[pages.length - 1].push(segment);
-          });
-        });
-      }
-    });
-
-    return pages.filter((page) => page.length);
-  }
-
-  function splitParagraphIntoSegments(paragraph) {
-    const style = getParagraphStyle(paragraph);
-    const numbered = hasNumbering(paragraph);
-    const segments = [];
-
-    let currentSegment = createSegment(false);
-
-    function createSegment(pageBreakBefore) {
-      return {
-        text: '',
-        parts: [],
-        imageRefs: [],
-        style,
-        numbered,
-        pageBreakBefore,
-      };
-    }
-
-    function pushSegment() {
-      if (!currentSegment) {
-        return;
-      }
-      const text = currentSegment.parts.join('');
-      if (text || currentSegment.imageRefs.length) {
-        segments.push({
-          text,
-          imageRefs: Array.from(new Set(currentSegment.imageRefs)),
-          style: currentSegment.style,
-          numbered: currentSegment.numbered,
-          pageBreakBefore: currentSegment.pageBreakBefore,
-        });
-      }
-    }
-
-    function startNewSegment() {
-      pushSegment();
-      currentSegment = createSegment(true);
-    }
-
-    paragraph.childNodes.forEach((node) => {
-      if (node.nodeType !== Node.ELEMENT_NODE) {
-        return;
-      }
-
-      if (node.namespaceURI === WORD_NS && node.localName === 'pPr') {
-        return;
-      }
-
-      if (node.namespaceURI === WORD_NS && node.localName === 'r') {
-        const runImages = extractImageIdsFromRun(node);
-        if (runImages.length) {
-          currentSegment.imageRefs.push(...runImages);
-        }
-
-        node.childNodes.forEach((child) => {
-          if (child.nodeType !== Node.ELEMENT_NODE) {
-            return;
-          }
-
-          if (child.namespaceURI === WORD_NS && child.localName === 't') {
-            currentSegment.parts.push(child.textContent || '');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'tab') {
-            currentSegment.parts.push('\t');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'br') {
-            const type = child.getAttributeNS(WORD_NS, 'type') || child.getAttribute('w:type') || '';
-            if (type.toLowerCase() === 'page') {
-              startNewSegment();
-            } else {
-              currentSegment.parts.push('\n');
-            }
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'lastRenderedPageBreak') {
-            startNewSegment();
-          }
-        });
-      } else if (node.namespaceURI === WORD_NS && node.localName === 'lastRenderedPageBreak') {
-        startNewSegment();
-      }
-    });
-
-    pushSegment();
-
-    return segments;
-  }
-
-  function extractCategoriesFromIndex(body) {
-    const map = new Map();
-    let currentCategory = null;
-
-    const paragraphs = Array.from(body.getElementsByTagNameNS(WORD_NS, 'p'));
-
-    for (const paragraph of paragraphs) {
-      const raw = extractParagraphText(paragraph);
-      const text = normalizeText(raw);
-      if (!text) {
-        continue;
-      }
-
-      const normalized = text.toLowerCase();
-
-      if (normalized === 'platos principales') {
-        currentCategory = 'principales';
-        continue;
-      }
-
-      if (normalized === 'postres') {
-        currentCategory = 'postres';
-        continue;
-      }
-
-      if (normalized.startsWith('tiempo de preparación') || normalized.startsWith('tiempo de preparacion')) {
-        break;
-      }
-
-      if (!currentCategory) {
-        continue;
-      }
-
-      if (shouldSkipTitle(text)) {
-        continue;
-      }
-
-      const normalizedTitle = normalizeTitle(text);
-      if (!normalizedTitle) {
-        continue;
-      }
-
-      if (map.has(normalizedTitle)) {
-        break;
-      }
-
-      map.set(normalizedTitle, currentCategory);
-    }
-
-    return map;
   }
 
   function buildRelationshipsMap(relsDom) {
@@ -707,39 +476,33 @@
         return;
       }
       if (node.namespaceURI === WORD_NS && node.localName === 'r') {
-        node.childNodes.forEach((child) => {
-          if (child.nodeType !== Node.ELEMENT_NODE) {
-            return;
-          }
-          if (child.namespaceURI === WORD_NS && child.localName === 't') {
-            parts.push(child.textContent || '');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'tab') {
-            parts.push('\t');
-          } else if (child.namespaceURI === WORD_NS && child.localName === 'br') {
-            const type = child.getAttributeNS(WORD_NS, 'type') || child.getAttribute('w:type') || '';
-            if (type.toLowerCase() !== 'page') {
-              parts.push('\n');
-            }
-          }
-        });
+        parts.push(extractRunText(node));
+      } else if (node.namespaceURI === WORD_NS && node.localName === 'pPr') {
+        // ignore paragraph properties
       } else if (node.namespaceURI === WORD_NS && node.localName === 'br') {
         parts.push('\n');
       }
     });
 
-    return parts.join('');
+    const text = parts.join('');
+    return text || paragraph.textContent || '';
   }
 
-  function extractImageIdsFromRun(run) {
-    const ids = [];
-    const blips = run.getElementsByTagNameNS(DRAWING_NS, 'blip');
-    Array.from(blips).forEach((blip) => {
-      const embed = blip.getAttributeNS(RELS_NS, 'embed') || blip.getAttribute('r:embed');
-      if (embed) {
-        ids.push(embed);
+  function extractRunText(run) {
+    const segments = [];
+    run.childNodes.forEach((child) => {
+      if (child.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+      if (child.namespaceURI === WORD_NS && child.localName === 't') {
+        segments.push(child.textContent || '');
+      } else if (child.namespaceURI === WORD_NS && child.localName === 'tab') {
+        segments.push('\t');
+      } else if (child.namespaceURI === WORD_NS && child.localName === 'br') {
+        segments.push('\n');
       }
     });
-    return ids;
+    return segments.join('');
   }
 
   function normalizeText(text) {
@@ -766,6 +529,18 @@
     return style.getAttributeNS(WORD_NS, 'val') || style.getAttribute('w:val') || null;
   }
 
+  function extractImageIds(paragraph) {
+    const ids = [];
+    const blips = paragraph.getElementsByTagNameNS(DRAWING_NS, 'blip');
+    Array.from(blips).forEach((blip) => {
+      const embed = blip.getAttributeNS(RELS_NS, 'embed') || blip.getAttribute('r:embed');
+      if (embed) {
+        ids.push(embed);
+      }
+    });
+    return ids;
+  }
+
   function hasNumbering(paragraph) {
     const props = paragraph.getElementsByTagNameNS(WORD_NS, 'pPr')[0];
     if (!props) {
@@ -775,29 +550,16 @@
   }
 
   function isValidRecipe(recipe) {
-    if (!recipe || !recipe.title) {
+    if (!recipe.title) {
       return false;
     }
+    const hasMetadata = recipe.metadata.some(Boolean);
     const hasSections = recipe.sections.some((section) => section.content.length > 0);
-    return hasSections;
+    return hasMetadata || hasSections;
   }
 
   function shouldSkipTitle(title) {
     const normalized = title.trim().toLowerCase();
-    return (
-      normalized === 'índice' ||
-      normalized.startsWith('pestaña') ||
-      normalized === 'platos principales' ||
-      normalized === 'postres'
-    );
-  }
-
-  function normalizeTitle(title) {
-    return title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\p{L}\p{N}]+/gu, ' ')
-      .trim();
+    return normalized === 'índice' || normalized.startsWith('pestaña');
   }
 })();
