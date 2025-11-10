@@ -40,6 +40,8 @@
   };
 
   let lastFocusedElement = null;
+  let pendingCategoryMarker = null;
+  let markerCountForCurrentRecipe = 0;
 
   document.addEventListener('DOMContentLoaded', init);
 
@@ -439,14 +441,18 @@
           finalizeCurrentRecipe();
 
           const leftover = lines.join('\n').trim();
+          const category =
+            pendingCategoryMarker || match.category || lastResolvedCategory || 'principales';
           recipe = {
             title: match.title || 'Receta sin título',
             metadata: [],
             sections: [],
             images: [],
-            category: match.category,
+            category,
           };
-          lastResolvedCategory = match.category;
+          lastResolvedCategory = category;
+          markerCountForCurrentRecipe = pendingCategoryMarker ? 1 : 0;
+          pendingCategoryMarker = null;
           currentSection = null;
           readingMetadata = true;
 
@@ -490,8 +496,18 @@
       if (markerCategory) {
         lastResolvedCategory = markerCategory;
         if (recipe) {
+          if (markerCountForCurrentRecipe > 0 && isValidRecipe(recipe)) {
+            finalizeCurrentRecipe();
+            pendingCategoryMarker = markerCategory;
+            markerCountForCurrentRecipe = 0;
+            return;
+          }
           recipe.category = markerCategory;
+          markerCountForCurrentRecipe += 1;
+          return;
         }
+        pendingCategoryMarker = markerCategory;
+        markerCountForCurrentRecipe = 0;
         return;
       }
 
@@ -579,6 +595,7 @@
       readingMetadata = false;
       deferredImages = [];
       pendingTitleImages = [];
+      markerCountForCurrentRecipe = 0;
     }
 
     function startRecipeFromPending() {
@@ -593,7 +610,8 @@
       }
 
       const match = resolveCategory(pendingTitleParts);
-      const category = match ? match.category : lastResolvedCategory || 'principales';
+      const category =
+        pendingCategoryMarker || (match ? match.category : lastResolvedCategory) || 'principales';
       const title = match && match.title ? match.title : combinedTitle;
 
       recipe = {
@@ -604,11 +622,9 @@
         category,
       };
 
-      if (match) {
-        lastResolvedCategory = match.category;
-      } else {
-        lastResolvedCategory = category;
-      }
+      lastResolvedCategory = category;
+      markerCountForCurrentRecipe = pendingCategoryMarker ? 1 : 0;
+      pendingCategoryMarker = null;
 
       currentSection = null;
       readingMetadata = true;
@@ -976,7 +992,17 @@
     if (!normalized) {
       return null;
     }
-    return CATEGORY_MARKERS[normalized] || null;
+    for (const [keyword, category] of Object.entries(CATEGORY_MARKERS)) {
+      if (
+        normalized === keyword ||
+        normalized.startsWith(`${keyword} `) ||
+        normalized.endsWith(` ${keyword}`) ||
+        normalized.includes(` ${keyword} `)
+      ) {
+        return category;
+      }
+    }
+    return null;
   }
 
   function getParagraphStyle(paragraph) {
