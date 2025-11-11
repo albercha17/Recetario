@@ -496,7 +496,7 @@
       if (markerCategory) {
         lastResolvedCategory = markerCategory;
         if (recipe) {
-          if (markerCountForCurrentRecipe > 0 && isValidRecipe(recipe)) {
+          if (markerCountForCurrentRecipe > 0 && hasRecipeContent(recipe)) {
             finalizeCurrentRecipe();
             pendingCategoryMarker = markerCategory;
             markerCountForCurrentRecipe = 0;
@@ -587,7 +587,7 @@
     }
 
     function finalizeCurrentRecipe() {
-      if (recipe && isValidRecipe(recipe)) {
+      if (recipe && hasRecipeContent(recipe)) {
         recipes.push(recipe);
       }
       recipe = null;
@@ -1025,12 +1025,13 @@
     return props.getElementsByTagNameNS(WORD_NS, 'numPr').length > 0;
   }
 
-  function isValidRecipe(recipe) {
+  function hasRecipeContent(recipe) {
     if (!recipe || !recipe.title) {
       return false;
     }
     const hasSections = recipe.sections.some((section) => section.content.length > 0);
-    return hasSections;
+    const hasMetadata = recipe.metadata.some((entry) => entry && entry.trim().length > 0);
+    return hasSections || hasMetadata || recipe.images.length > 0;
   }
 
   function shouldSkipTitle(title) {
