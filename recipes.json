@@ -1038,11 +1038,11 @@
       "Endulzamos y montamos. Le echamos el chocolate derretido y stevia hasta que encontremos el dulzor correcto. Echar un poco de sal para intensificar el sabor. Echar al molde y dar golpecitos para sacar el aire",
       "Horno. Meter al horno 30 minutos a 180º. Cuando la saquemos veremos que está muy líquida. Es normal, luego se volverá más compacta. Dejar reposar 3 horas mínimo.     ¡A comer!"
     ],
-    "consejos": [],
+    "consejos": ["No poner papel de horno en la base, ya que se pegara en la galleta. Aunque la veamos muy líquida, está bien, ya que luego cogerá consistencia."],
     "ruta_imagen": "imagenes/tarta-de-queso-con-chocolate-blanco.jpg"
   },
   {
-    "titulo": "No poner papel de horno en la base, ya que se pegara en la galleta. Aunque la veamos muy líquida, está bien, ya que luego cogerá consistencia.\nTartaleta de manzana",
+    "titulo": "Tartaleta de manzana",
     "tipo": "postre",
     "ingredientes": [],
     "pasos": [],
