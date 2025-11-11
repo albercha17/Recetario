@@ -531,14 +531,11 @@
     "tipo": "principal",
     "ingredientes": [],
     "pasos": [],
-    "consejos": [
-      "Pasta Frutti",
-      "Di Mare"
-    ],
+    "consejos": [],
     "ruta_imagen": "imagenes/pasta-con-gulas.jpg"
   },
   {
-    "titulo": "Di Mare",
+    "titulo": "Pasta Di Mare",
     "tipo": "principal",
     "ingredientes": [],
     "pasos": [],
