@@ -55,15 +55,15 @@
           </div>
         </div>
       </header>
+
+      <!-- Contenido principal -->
       <main class="content" aria-live="polite">
-        <section id="empty-state" class="empty-state" hidden>
-          <div class="empty-state__icon" aria-hidden="true">🍽️</div>
-          <h2 id="empty-state-title"></h2>
-          <p id="empty-state-message"></p>
-        </section>
+        <!-- Eliminado el bloque empty-state para quitar el icono y el hueco -->
         <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
       </main>
     </div>
+
+    <!-- Modal para detalles de receta -->
     <div id="modal" class="modal hidden" aria-hidden="true">
       <div class="modal__backdrop" data-dismiss="modal"></div>
       <article class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
