@@ -92,7 +92,7 @@
       "Reposar. Dejar reposar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/arroz-con-calamares.jpg"
+    "ruta_imagen": "imagenes/arroz-con-calamares-jpg.png"
   },
   {
     "titulo": "Arroz con costillas",
@@ -168,7 +168,7 @@
       "Sacar. Sacar y dejar enfriar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/bu-uelos-de-patata.jpg"
+    "ruta_imagen": "imagenes/bunuelos-de-patatas.jpg"
   },
   {
     "titulo": "Carrilleras en salsa",
@@ -176,7 +176,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/carrilleras-en-salsa.jpg"
+    "ruta_imagen": "imagenes/Carrillerasensalsa.jpg"
   },
   {
     "titulo": "Cocido madrileño",
@@ -204,7 +204,7 @@
       "Importante quitar la grasa antes de cerrar la olla.",
       "Cordero asado"
     ],
-    "ruta_imagen": "imagenes/cocido-madrile-o.jpg"
+    "ruta_imagen": "imagenes/cocido-madrileno.jpg"
   },
   {
     "titulo": "Cordero asado",
@@ -212,7 +212,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/cordero-asado.jpg"
+    "ruta_imagen": "imagenes/Cordero-asado.jpg"
   },
   {
     "titulo": "Costillar a la barbacoa",
@@ -280,7 +280,7 @@
       "Es muy importante sofreír a fuego lento y sin dejar de mover.",
       "Gachas manchegas"
     ],
-    "ruta_imagen": "imagenes/fumet-de-gambones.jpg"
+    "ruta_imagen": "imagenes/fumtet-de-gambones.jpg"
   },
   {
     "titulo": "Gachas manchegas",
@@ -316,7 +316,7 @@
       "Añadir espinacas. Añadir pimienta, comino y pimentón. Añadir espinacas."
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/garbanzos-con-espinacas.jpg"
+    "ruta_imagen": "imagenes/garbanzos-espinacas.jpg"
   },
   {
     "titulo": "Huevo al plato",
