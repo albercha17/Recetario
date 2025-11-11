@@ -86,6 +86,17 @@ body.no-scroll {
   width: 100%;
 }
 
+.header__filters {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.header__filters .filter-group {
+  width: 100%;
+  justify-content: flex-start;
+}
+
 .search {
   position: relative;
   display: flex;
@@ -128,6 +139,8 @@ body.no-scroll {
 .filter-group {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 4px;
   border-radius: 999px;
@@ -190,57 +203,7 @@ body.no-scroll {
 
 .content {
   display: grid;
-  gap: 32px;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 4px;
-}
-
-.category-heading {
-  margin: 0;
-  font-size: clamp(20px, 5vw, 26px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--text-primary);
-}
-
-.loader {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 24px;
-  border-radius: var(--radius-md);
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-}
-
-.loader[hidden] {
-  display: none;
-}
-
-.loader__spinner {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  border: 3px solid rgba(148, 163, 184, 0.24);
-  border-top-color: var(--accent);
-  animation: spin 0.8s linear infinite;
-}
-
-.loader__text {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  gap: 24px;
 }
 
 @media (min-width: 640px) {
@@ -259,6 +222,14 @@ body.no-scroll {
   .search {
     flex: 1;
     min-width: 260px;
+  }
+
+  .header__filters {
+    justify-content: flex-end;
+  }
+
+  .header__filters .filter-group {
+    width: auto;
   }
 }
 
@@ -327,6 +298,25 @@ body.no-scroll {
   align-items: flex-end;
   justify-content: flex-start;
   overflow: hidden;
+}
+
+.recipe-card__badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.45);
 }
 
 .recipe-card__image::after {
@@ -480,6 +470,15 @@ body.no-scroll {
 .modal__content h2 {
   margin: 0;
   font-size: clamp(24px, 4vw, 30px);
+}
+
+.modal__type {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 14px;
 }
 
 .metadata {

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Recetario familiar</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -32,31 +31,36 @@
               autocomplete="off"
             />
           </label>
-          <div class="filter-group" role="group" aria-label="Filtrar por tipo de receta">
-            <button type="button" class="filter-button is-active" data-filter="principales">
-              <span class="filter-button__label">Principales</span>
-              <span class="filter-button__count" data-count="principales">0</span>
-            </button>
-            <button type="button" class="filter-button" data-filter="postres">
-              <span class="filter-button__label">Postres</span>
-              <span class="filter-button__count" data-count="postres">0</span>
-            </button>
+          <div class="header__filters">
+            <div class="filter-group" role="group" aria-label="Filtrar por tipo de plato">
+              <button
+                type="button"
+                class="filter-button"
+                data-filter-type="principal"
+                aria-pressed="false"
+              >
+                <span class="filter-button__label">Platos principales</span>
+                <span class="filter-button__count" data-filter-count>0</span>
+              </button>
+              <button
+                type="button"
+                class="filter-button"
+                data-filter-type="postre"
+                aria-pressed="false"
+              >
+                <span class="filter-button__label">Postres</span>
+                <span class="filter-button__count" data-filter-count>0</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
       <main class="content" aria-live="polite">
-        <section id="loader" class="loader" role="status">
-          <span class="loader__spinner" aria-hidden="true"></span>
-          <span class="loader__text">Cargando recetas…</span>
-        </section>
         <section id="empty-state" class="empty-state" hidden>
           <div class="empty-state__icon" aria-hidden="true">🍽️</div>
           <h2 id="empty-state-title"></h2>
           <p id="empty-state-message"></p>
         </section>
-        <header class="category-header">
-          <h2 id="category-heading" class="category-heading">Platos principales · 0 recetas</h2>
-        </header>
         <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
       </main>
     </div>
@@ -75,7 +79,7 @@
           <div id="modal-gallery" class="modal__gallery" aria-label="Imágenes de la receta"></div>
           <div class="modal__content">
             <h2 id="modal-title"></h2>
-            <ul id="modal-meta" class="metadata"></ul>
+            <p id="modal-type" class="modal__type" hidden></p>
             <div id="modal-sections" class="sections"></div>
           </div>
         </div>
