@@ -1,5 +1,4 @@
 (() => {
-  const loader = document.getElementById('loader');
   const cardsContainer = document.getElementById('cards');
   const emptyState = document.getElementById('empty-state');
   const emptyTitle = document.getElementById('empty-state-title');
@@ -11,10 +10,12 @@
   const modalSections = document.getElementById('modal-sections');
   const modalType = document.getElementById('modal-type');
   const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
+  const filterButtons = Array.from(document.querySelectorAll('[data-filter-type]'));
 
   const state = {
     recipes: [],
     filtered: [],
+    activeTypes: new Set(),
   };
 
   let lastFocusedElement = null;
@@ -37,11 +38,21 @@
         message:
           'Revisa que el archivo recipes.json esté en la raíz del repositorio y tenga el formato correcto.',
       });
-    } finally {
-      loader.hidden = true;
+      updateFilterCounts([]);
+      updateFilterButtons();
     }
 
     searchInput.addEventListener('input', handleSearch);
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const { filterType } = button.dataset;
+        if (!filterType) {
+          return;
+        }
+        toggleTypeFilter(filterType);
+      });
+    });
+    updateFilterButtons();
     dismissButtons.forEach((button) => button.addEventListener('click', closeModal));
     modal.addEventListener('click', (event) => {
       if (event.target instanceof HTMLElement && event.target.dataset.dismiss === 'modal') {
@@ -68,12 +79,16 @@
       ? payload.recipes
       : [];
 
-    return entries.map(normalizeRecipe);
+    return entries
+      .map(normalizeRecipe)
+      .sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
   }
 
   function normalizeRecipe(entry) {
     const rawTitle = typeof entry.titulo === 'string' ? entry.titulo.trim() : '';
     const type = typeof entry.tipo === 'string' ? entry.tipo.trim() : '';
+    const typeKey = getTypeKey(type);
+    const typeLabel = formatRecipeType(type);
 
     const ingredients = Array.isArray(entry.ingredientes)
       ? entry.ingredientes.map((value) => String(value).trim()).filter(Boolean)
@@ -102,13 +117,15 @@
       image = imageName.includes('/') ? imageName : `images/${imageName}`;
     }
 
-    const searchParts = [rawTitle, type, ...ingredients, ...steps, ...tips]
+    const searchParts = [rawTitle, type, typeLabel, ...ingredients, ...steps, ...tips]
       .map((value) => normalizeText(value))
       .filter(Boolean);
 
     return {
       title: rawTitle || 'Receta sin título',
       type,
+      typeKey,
+      typeLabel,
       ingredients,
       steps,
       tips,
@@ -124,8 +141,93 @@
       .replace(/\p{Diacritic}/gu, '');
   }
 
+  function getTypeKey(value) {
+    return normalizeText(value).replace(/\s+/g, '');
+  }
+
+  function formatRecipeType(value) {
+    const key = getTypeKey(value);
+    if (!key) {
+      return '';
+    }
+
+    if (key === 'principal') {
+      return 'Plato principal';
+    }
+
+    if (key === 'postre') {
+      return 'Postre';
+    }
+
+    if (key === 'desconocido') {
+      return 'Desconocido';
+    }
+
+    return capitalize(value);
+  }
+
+  function capitalize(value) {
+    const text = String(value || '').trim();
+    if (!text) {
+      return '';
+    }
+    return text.charAt(0).toLocaleUpperCase('es') + text.slice(1);
+  }
+
   function handleSearch() {
     applyFilters();
+  }
+
+  function toggleTypeFilter(type) {
+    const key = getTypeKey(type);
+    if (!key) {
+      return;
+    }
+
+    if (state.activeTypes.has(key)) {
+      state.activeTypes.delete(key);
+    } else {
+      state.activeTypes.add(key);
+    }
+
+    updateFilterButtons();
+    applyFilters();
+  }
+
+  function updateFilterButtons() {
+    filterButtons.forEach((button) => {
+      const key = getTypeKey(button.dataset.filterType || '');
+      const isActive = key ? state.activeTypes.has(key) : false;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  }
+
+  function updateFilterCounts(recipes) {
+    const counts = {};
+    filterButtons.forEach((button) => {
+      const key = getTypeKey(button.dataset.filterType || '');
+      if (key) {
+        counts[key] = 0;
+      }
+    });
+
+    recipes.forEach((recipe) => {
+      if (recipe.typeKey && Object.prototype.hasOwnProperty.call(counts, recipe.typeKey)) {
+        counts[recipe.typeKey] += 1;
+      }
+    });
+
+    filterButtons.forEach((button) => {
+      const countEl = button.querySelector('[data-filter-count]');
+      const key = getTypeKey(button.dataset.filterType || '');
+      if (!countEl || !key) {
+        return;
+      }
+      const count = counts[key] ?? 0;
+      countEl.textContent = count;
+      button.setAttribute('data-count', String(count));
+    });
   }
 
   function applyFilters() {
@@ -137,6 +239,7 @@
         title: 'No hay recetas disponibles',
         message: 'Añade tus recetas dentro de recipes.json para verlas aquí.',
       });
+      updateFilterCounts([]);
       return;
     }
 
@@ -146,6 +249,12 @@
     let filtered = state.recipes;
     if (normalizedQuery) {
       filtered = filtered.filter((recipe) => recipe.searchText.includes(normalizedQuery));
+    }
+
+    updateFilterCounts(filtered);
+
+    if (state.activeTypes.size) {
+      filtered = filtered.filter((recipe) => state.activeTypes.has(recipe.typeKey));
     }
 
     state.filtered = filtered;
@@ -198,18 +307,18 @@
     card.type = 'button';
     card.className = 'recipe-card';
     card.dataset.hasImage = recipe.image ? 'true' : 'false';
-    if (recipe.type) {
-      card.setAttribute('data-type', recipe.type);
+    if (recipe.typeKey) {
+      card.setAttribute('data-type', recipe.typeKey);
     }
     card.setAttribute('aria-label', `Ver detalles de ${recipe.title}`);
 
     const image = document.createElement('div');
     image.className = 'recipe-card__image';
 
-    if (recipe.type) {
+    if (recipe.typeLabel) {
       const badge = document.createElement('span');
       badge.className = 'recipe-card__badge';
-      badge.textContent = recipe.type;
+      badge.textContent = recipe.typeLabel;
       image.appendChild(badge);
     }
 
@@ -267,8 +376,8 @@
     modalTitle.textContent = recipe.title;
 
     if (modalType) {
-      if (recipe.type) {
-        modalType.textContent = recipe.type;
+      if (recipe.typeLabel) {
+        modalType.textContent = recipe.typeLabel;
         modalType.hidden = false;
       } else {
         modalType.textContent = '';

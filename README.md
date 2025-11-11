@@ -7,7 +7,9 @@ Aplicación estática que muestra un catálogo moderno de recetas optimizado par
 - Al cargar la página se descarga `recipes.json`, se interpreta en el navegador y se generan las fichas de cada receta.
 - Cada tarjeta muestra la fotografía (si existe), el tipo de plato y el nombre de la receta. Al tocarla se abre un panel con ingredientes, pasos y consejos.
 - El buscador filtra en tiempo real por nombre, tipo o por cualquier texto incluido en los ingredientes, los pasos o los consejos.
+- Puedes alternar los botones de **Platos principales** y **Postres** para limitar los resultados por tipo manteniendo el recuento disponible tras una búsqueda.
 - Cada vez que actualices el archivo JSON y publiques los cambios en GitHub, la web mostrará automáticamente la nueva información.
+- Las recetas se muestran ordenadas alfabéticamente por título para localizar cada plato con mayor rapidez.
 
 ## Publicación en GitHub Pages
 

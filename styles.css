@@ -86,6 +86,17 @@ body.no-scroll {
   width: 100%;
 }
 
+.header__filters {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.header__filters .filter-group {
+  width: 100%;
+  justify-content: flex-start;
+}
+
 .search {
   position: relative;
   display: flex;
@@ -128,6 +139,8 @@ body.no-scroll {
 .filter-group {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 4px;
   border-radius: 999px;
@@ -193,41 +206,6 @@ body.no-scroll {
   gap: 24px;
 }
 
-.loader {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 24px;
-  border-radius: var(--radius-md);
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-}
-
-.loader[hidden] {
-  display: none;
-}
-
-.loader__spinner {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  border: 3px solid rgba(148, 163, 184, 0.24);
-  border-top-color: var(--accent);
-  animation: spin 0.8s linear infinite;
-}
-
-.loader__text {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @media (min-width: 640px) {
   .app-header {
     flex-direction: row;
@@ -244,6 +222,14 @@ body.no-scroll {
   .search {
     flex: 1;
     min-width: 260px;
+  }
+
+  .header__filters {
+    justify-content: flex-end;
+  }
+
+  .header__filters .filter-group {
+    width: auto;
   }
 }
 

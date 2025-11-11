@@ -31,13 +31,31 @@
               autocomplete="off"
             />
           </label>
+          <div class="header__filters">
+            <div class="filter-group" role="group" aria-label="Filtrar por tipo de plato">
+              <button
+                type="button"
+                class="filter-button"
+                data-filter-type="principal"
+                aria-pressed="false"
+              >
+                <span class="filter-button__label">Platos principales</span>
+                <span class="filter-button__count" data-filter-count>0</span>
+              </button>
+              <button
+                type="button"
+                class="filter-button"
+                data-filter-type="postre"
+                aria-pressed="false"
+              >
+                <span class="filter-button__label">Postres</span>
+                <span class="filter-button__count" data-filter-count>0</span>
+              </button>
+            </div>
+          </div>
         </div>
       </header>
       <main class="content" aria-live="polite">
-        <section id="loader" class="loader" role="status">
-          <span class="loader__spinner" aria-hidden="true"></span>
-          <span class="loader__text">Cargando recetas…</span>
-        </section>
         <section id="empty-state" class="empty-state" hidden>
           <div class="empty-state__icon" aria-hidden="true">🍽️</div>
           <h2 id="empty-state-title"></h2>
