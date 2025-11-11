@@ -29,7 +29,7 @@
   },
   {
     "titulo": "Arroz a la cubana",
-    "tipo": "desconocido",
+    "tipo": "principal",
     "ingredientes": [
       "Arroz",
       "2 dientes de ajo",
@@ -1072,13 +1072,5 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/torrijas-de-la-abuela.jpg"
-  },
-  {
-    "titulo": "P",
-    "tipo": "desconocido",
-    "ingredientes": [],
-    "pasos": [],
-    "consejos": [],
-    "ruta_imagen": "imagenes/p.jpg"
   }
 ]
