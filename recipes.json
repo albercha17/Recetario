@@ -436,7 +436,7 @@
     "consejos": [
       "No hace falta sofreírlo, pero le da un toque extra."
     ],
-    "ruta_imagen": "imagenes/lentejas-con-verdura-pollo-y-chorizo.png",
+    "ruta_imagen": "imagenes/lentejas.jpg",
     "foto": "",
     "link": ""
   },
@@ -457,7 +457,7 @@
       "Cocer. Cubrir de agua y cocerlo durante 30 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/magro-con-tomate.png",
+    "ruta_imagen": "imagenes/magro-tomate.jpg",
     "foto": "",
     "link": ""
   },
@@ -467,7 +467,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/migas-manchegas.png",
+    "ruta_imagen": "imagenes/migas-manchegas.lpg.jpg",
     "foto": "",
     "link": ""
   },
@@ -477,7 +477,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa.png",
+    "ruta_imagen": "imagenes/pollo-en-salsa.jpg",
     "foto": "",
     "link": ""
   },
@@ -487,7 +487,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa-de-cocacola.png",
+    "ruta_imagen": "imagenes/pollo-coca-cola.jpg",
     "foto": "",
     "link": ""
   },
@@ -508,7 +508,7 @@
       "Soja. Ir echando salsa de soja y remover hasta que encontremos el sabor que queremos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/noodles-de-arroz-con-pollo-y-verduras.png",
+    "ruta_imagen": "imagenes/noodles-con-pollo.jpg",
     "foto": "",
     "link": ""
   },
@@ -529,7 +529,7 @@
       "Ñoquis. Añadir ñoquis. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/noquis-con-salsa-de-queso-azul.png",
+    "ruta_imagen": "imagenes/noquis-con-salsa-de-queso-azul.jpg",
     "foto": "",
     "link": ""
   },
@@ -549,7 +549,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/palmeras-de-pizza.png",
+    "ruta_imagen": "imagenes/Palmeras-de-pizza.jpg",
     "foto": "",
     "link": ""
   },
@@ -575,7 +575,7 @@
       "Agua. Si queda muy compacto, echamos agua de cocción. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-carbonara.png",
+    "ruta_imagen": "imagenes/espaguetis-a-la-carbonarajpg.jpg",
     "foto": "",
     "link": ""
   },
@@ -594,17 +594,17 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-con-gulas.png",
+    "ruta_imagen": "imagenes/espaguetis-con-gulas-y-setas.jpg",
     "foto": "",
     "link": ""
   },
   {
-    "titulo": "Pasta Di Mare",
+    "titulo": "Pasta Frutti Di Mare",
     "tipo": "principal",
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-di-mare.png",
+    "ruta_imagen": "imagenes/spaghetti-frutti-di-mare.jpg",
     "foto": "",
     "link": ""
   },
@@ -666,7 +666,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pimiento-de-piquillo-relleno-de-bacalao.png",
+    "ruta_imagen": "imagenes/Pimientos-del-piquillo-rellenos-de-bacalao.jpg",
     "foto": "",
     "link": ""
   },
@@ -705,17 +705,17 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pizza-con-burrata-y-pesto.png",
+    "ruta_imagen": "imagenes/pizza-con-burrta-y-pesto.jpg",
     "foto": "",
     "link": ""
   },
   {
-    "titulo": "Pizza de arroz",
+    "titulo": "Pizza con masa de arroz",
     "tipo": "principal",
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pizza-de-arroz.png",
+    "ruta_imagen": "imagenes/Pizza-de-arroz.jpg",
     "foto": "",
     "link": ""
   },
