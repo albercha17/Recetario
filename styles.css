@@ -262,3 +262,20 @@ body.no-scroll{overflow:hidden}
     padding-top: calc(120px + env(safe-area-inset-top, 0px));
   }
 }
+/* Empuje dinámico según alto real del header (lo fija app.js en --header-h) */
+:root { --header-h: 110px; } /* valor de respaldo */
+.content{
+  padding-top: calc(var(--header-h) + 8px + env(safe-area-inset-top, 0px));
+  display: grid;
+  gap: 12px;
+}
+
+/* El header sigue fijo arriba en iPhone */
+.app-header{
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0; right: 0; z-index: 1000;
+}
+
+/* Quitar el botón de link de la tarjeta por completo */
+.recipe-card__linkbtn{ display: none !important; }

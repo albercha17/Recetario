@@ -10,9 +10,9 @@
   const modalSections = document.getElementById('modal-sections');
   const modalType = document.getElementById('modal-type');
   const modalActions = document.getElementById('modal-actions');
-
   const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
   const filterButtons = Array.from(document.querySelectorAll('[data-filter-type]'));
+  const header = document.querySelector('.app-header');
 
   const state = { recipes: [], filtered: [], activeTypes: new Set() };
   let lastFocusedElement = null;
@@ -20,6 +20,20 @@
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
+    // --- medir header y actualizar padding ---
+    const updateHeaderSpace = () => {
+      if (!header) return;
+      const h = Math.ceil(header.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--header-h', h + 'px');
+    };
+    updateHeaderSpace();
+    window.addEventListener('resize', updateHeaderSpace);
+    // iOS: cuando aparece/desaparece teclado
+    window.addEventListener('orientationchange', () => setTimeout(updateHeaderSpace, 250));
+    // al enfocar el buscador puede cambiar la altura
+    searchInput?.addEventListener('focus', () => setTimeout(updateHeaderSpace, 150));
+    searchInput?.addEventListener('blur', () => setTimeout(updateHeaderSpace, 150));
+
     try {
       const recipes = await loadRecipes();
       state.recipes = recipes;
@@ -37,7 +51,7 @@
       updateFilterCounts([]);
     }
 
-    searchInput.addEventListener('input', handleSearch);
+    searchInput?.addEventListener('input', handleSearch);
     filterButtons.forEach((button) => {
       button.addEventListener('click', () => toggleTypeFilter(button.dataset.filterType));
     });
@@ -57,8 +71,6 @@
     const payload = await response.json();
     const entries = Array.isArray(payload) ? payload : Array.isArray(payload.recipes) ? payload.recipes : [];
     const normalized = entries.map(normalizeRecipe);
-    // Log rápido para comprobar que llega el link (te ayuda a verificar la Fabada)
-    console.table(normalized.map(r => ({ title: r.title, link: r.link })));
     return normalized.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
   }
 
@@ -68,42 +80,30 @@
     const typeKey = getTypeKey(type);
     const typeLabel = formatRecipeType(type);
 
-    const ingredients = Array.isArray(entry.ingredientes) ? entry.ingredientes.map(String).map(s => s.trim()).filter(Boolean) : [];
-    const steps = Array.isArray(entry.pasos) ? entry.pasos.map(String).map(s => s.trim()).filter(Boolean) : [];
-
+    const ingredients = Array.isArray(entry.ingredientes) ? entry.ingredientes.map((s)=>String(s).trim()).filter(Boolean) : [];
+    const steps = Array.isArray(entry.pasos) ? entry.pasos.map((s)=>String(s).trim()).filter(Boolean) : [];
     let tips = [];
-    if (Array.isArray(entry.consejos)) tips = entry.consejos.map(String).map(s => s.trim()).filter(Boolean);
-    else if (typeof entry.consejos === 'string') {
-      const t = entry.consejos.trim();
-      if (t) tips = [t];
-    }
+    if (Array.isArray(entry.consejos)) tips = entry.consejos.map((s)=>String(s).trim()).filter(Boolean);
+    else if (typeof entry.consejos === 'string' && entry.consejos.trim()) tips = [entry.consejos.trim()];
 
     const imagePath = typeof entry.ruta_imagen === 'string' ? entry.ruta_imagen.trim() : '';
     const imageName = typeof entry.foto === 'string' ? entry.foto.trim() : '';
-    let image = imagePath || (imageName ? (imageName.includes('/') ? imageName : `images/${imageName}`) : '');
-
-    // Acepta links absolutos o relativos
+    const image = imagePath || (imageName ? (imageName.includes('/') ? imageName : `images/${imageName}`) : '');
     const link = typeof entry.link === 'string' ? entry.link.trim() : '';
 
     const searchParts = [rawTitle, type, typeLabel, ...ingredients, ...steps, ...tips]
-      .map((v) => normalizeText(v))
-      .filter(Boolean);
+      .map(normalizeText).filter(Boolean);
 
     return {
       title: rawTitle || 'Receta sin título',
-      type,
-      typeKey,
-      typeLabel,
-      ingredients,
-      steps,
-      tips,
-      image,
-      link,
-      searchText: searchParts.join(' '),
+      type, typeKey, typeLabel,
+      ingredients, steps, tips,
+      image, link,
+      searchText: searchParts.join(' ')
     };
   }
 
-  const normalizeText = (value) => String(value || '')
+  const normalizeText = (v) => String(v || '')
     .toLocaleLowerCase('es')
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '');
@@ -115,11 +115,11 @@
     if (!key) return '';
     if (key === 'principal') return 'Plato principal';
     if (key === 'postre') return 'Postre';
-    if (key === 'desconocido') return 'Desconocido';
     return value.charAt(0).toLocaleUpperCase('es') + value.slice(1);
   }
 
   function handleSearch() { applyFilters(); }
+
   function toggleTypeFilter(type) {
     const key = getTypeKey(type || '');
     if (!key) return;
@@ -154,16 +154,12 @@
     if (!state.recipes.length) {
       state.filtered = [];
       renderCards([]);
-      setEmptyState({
-        visible: true,
-        title: 'No hay recetas disponibles',
-        message: 'Añade tus recetas dentro de recipes.json para verlas aquí.',
-      });
+      setEmptyState({ visible: true, title: 'No hay recetas', message: 'Añade tus recetas a recipes.json.' });
       updateFilterCounts([]);
       return;
     }
 
-    const query = searchInput.value.trim();
+    const query = searchInput?.value.trim() || '';
     const normalizedQuery = normalizeText(query);
     let filtered = state.recipes;
 
@@ -173,11 +169,8 @@
 
     state.filtered = filtered;
     renderCards(filtered);
-
-    if (!filtered.length) {
-      const message = query ? `No hay recetas que coincidan con “${query}”.` : 'No hay recetas registradas en este momento.';
-      setEmptyState({ visible: true, title: 'Sin resultados', message });
-    } else setEmptyState({ visible: false });
+    if (!filtered.length) setEmptyState({ visible: true, title: 'Sin resultados', message: `No hay coincidencias con “${query}”.` });
+    else setEmptyState({ visible: false });
   }
 
   function setEmptyState({ visible, title = '', message = '' }) {
@@ -232,24 +225,7 @@
     title.textContent = recipe.title;
     image.appendChild(title);
 
-    // Botón de link en la tarjeta (si hay link)
-    if (recipe.link) {
-      const linkBtn = document.createElement('a');
-      linkBtn.href = recipe.link;
-      linkBtn.target = '_blank';
-      linkBtn.rel = 'noopener noreferrer';
-      linkBtn.className = 'recipe-card__linkbtn';
-      linkBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" fill="currentColor"></path>
-        </svg>
-        <span>Abrir</span>
-      `;
-      // Evitar que abrir el link también dispare el modal
-      linkBtn.addEventListener('click', (e) => e.stopPropagation());
-      image.appendChild(linkBtn);
-    }
-
+    // ❌ SIN botón de link en la tarjeta
     card.appendChild(image);
 
     card.addEventListener('click', () => openRecipe(recipe));
@@ -267,8 +243,7 @@
     modal.classList.remove('hidden');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('no-scroll');
-    const closeButton = modal.querySelector('.modal__close');
-    if (closeButton instanceof HTMLElement) closeButton.focus();
+    modal.querySelector('.modal__close')?.focus();
   }
 
   function closeModal() {
@@ -281,24 +256,20 @@
 
   function populateModal(recipe) {
     modalTitle.textContent = recipe.title;
-
-    if (modalType) {
-      if (recipe.typeLabel) { modalType.textContent = recipe.typeLabel; modalType.hidden = false; }
-      else { modalType.textContent = ''; modalType.hidden = true; }
-    }
+    if (recipe.typeLabel) { modalType.textContent = recipe.typeLabel; modalType.hidden = false; }
+    else { modalType.textContent = ''; modalType.hidden = true; }
 
     modalGallery.innerHTML = '';
     if (recipe.image) {
-      const image = document.createElement('img');
-      image.src = recipe.image;
-      image.loading = 'lazy';
-      image.alt = `Fotografía de ${recipe.title}`;
-      modalGallery.appendChild(image);
+      const img = document.createElement('img');
+      img.src = recipe.image; img.loading = 'lazy';
+      img.alt = `Fotografía de ${recipe.title}`;
+      modalGallery.appendChild(img);
     } else {
-      const placeholder = document.createElement('div');
-      placeholder.className = 'modal__placeholder';
-      placeholder.textContent = 'Esta receta no tiene fotografía.';
-      modalGallery.appendChild(placeholder);
+      const ph = document.createElement('div');
+      ph.className = 'modal__placeholder';
+      ph.textContent = 'Esta receta no tiene fotografía.';
+      modalGallery.appendChild(ph);
     }
 
     modalSections.innerHTML = '';
@@ -308,13 +279,13 @@
     if (recipe.tips.length) sections.push(createParagraphSection('Consejos', recipe.tips));
     if (sections.length) sections.forEach((s) => modalSections.appendChild(s));
     else {
-      const empty = document.createElement('p');
-      empty.className = 'modal__empty';
-      empty.textContent = 'No hay información disponible para esta receta.';
-      modalSections.appendChild(empty);
+      const p = document.createElement('p');
+      p.className = 'modal__empty';
+      p.textContent = 'No hay información disponible para esta receta.';
+      modalSections.appendChild(p);
     }
 
-    // Botón a link si existe
+    // ✅ Solo botón de link en el modal
     modalActions.innerHTML = '';
     if (recipe.link) {
       const linkBtn = document.createElement('a');
@@ -336,22 +307,21 @@
   }
 
   function createListSection(title, items) {
-    const sectionElement = document.createElement('section');
-    sectionElement.className = 'recipe-section';
-    const heading = document.createElement('h3');
-    heading.textContent = title;
-    sectionElement.appendChild(heading);
-    const list = document.createElement('ul');
-    items.forEach((item) => { const li = document.createElement('li'); li.textContent = item; list.appendChild(li); });
-    sectionElement.appendChild(list);
-    return sectionElement;
-    }
+    const section = document.createElement('section');
+    section.className = 'recipe-section';
+    const h3 = document.createElement('h3'); h3.textContent = title;
+    section.appendChild(h3);
+    const ul = document.createElement('ul');
+    items.forEach((it) => { const li = document.createElement('li'); li.textContent = it; ul.appendChild(li); });
+    section.appendChild(ul);
+    return section;
+  }
 
   function createParagraphSection(title, paragraphs) {
-    const sectionElement = document.createElement('section');
-    sectionElement.className = 'recipe-section';
-    const heading = document.createElement('h3'); heading.textContent = title; sectionElement.appendChild(heading);
-    paragraphs.forEach((text) => { const p = document.createElement('p'); p.textContent = text; sectionElement.appendChild(p); });
-    return sectionElement;
+    const section = document.createElement('section');
+    section.className = 'recipe-section';
+    const h3 = document.createElement('h3'); h3.textContent = title; section.appendChild(h3);
+    paragraphs.forEach((t) => { const p = document.createElement('p'); p.textContent = t; section.appendChild(p); });
+    return section;
   }
 })();
