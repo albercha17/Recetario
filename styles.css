@@ -141,34 +141,76 @@ body.no-scroll {
   align-items: center;
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 4px;
+  gap: 10px;
+  padding: 6px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.92));
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 36px rgba(8, 14, 35, 0.55);
 }
 
 .filter-button {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  border: 0;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 999px;
-  padding: 8px 18px;
+  padding: 10px 24px;
   font: inherit;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text-secondary);
-  background: transparent;
+  background: rgba(148, 163, 184, 0.12);
   cursor: pointer;
-  transition: background-color var(--transition), color var(--transition), box-shadow var(--transition);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 26px rgba(8, 14, 35, 0.32);
+  transition: transform var(--transition), background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
+  overflow: hidden;
+}
+
+.filter-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(56, 189, 248, 0.08));
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.filter-button:hover::before {
+  opacity: 1;
 }
 
 .filter-button.is-active {
   color: #0f172a;
-  background: var(--accent);
-  box-shadow: 0 8px 18px rgba(249, 115, 22, 0.35);
+  background: linear-gradient(135deg, #f97316, #fb923c 55%, #facc15);
+  border-color: transparent;
+  box-shadow: 0 18px 30px rgba(249, 115, 22, 0.35);
+  transform: translateY(-1px);
+}
+
+.filter-button.is-active::before {
+  opacity: 0;
+}
+
+.filter-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: inherit;
+  transition: background var(--transition), color var(--transition);
+}
+
+.filter-button svg {
+  width: 18px;
+  height: 18px;
 }
 
 .filter-button__label {
@@ -176,15 +218,21 @@ body.no-scroll {
 }
 
 .filter-button__count {
-  min-width: 28px;
-  padding: 4px 8px;
+  min-width: 30px;
+  padding: 4px 10px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.55);
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  transition: background-color var(--transition), color var(--transition);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: background var(--transition), color var(--transition);
+}
+
+.filter-button.is-active .filter-button__icon {
+  background: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
 }
 
 .filter-button.is-active .filter-button__count {
@@ -193,12 +241,21 @@ body.no-scroll {
 }
 
 .filter-button:focus-visible {
-  outline: 2px solid rgba(249, 115, 22, 0.65);
-  outline-offset: 2px;
+  outline: 2px solid rgba(248, 250, 252, 0.28);
+  outline-offset: 3px;
 }
 
 .filter-button:not(.is-active):hover {
   color: var(--text-primary);
+  background: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 20px 34px rgba(8, 14, 35, 0.42);
+}
+
+.filter-button:not(.is-active):hover .filter-button__icon,
+.filter-button:not(.is-active):hover .filter-button__count {
+  background: rgba(15, 23, 42, 0.4);
 }
 
 .content {
