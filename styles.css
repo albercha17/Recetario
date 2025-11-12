@@ -248,3 +248,17 @@ body.no-scroll{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   *{ transition-duration:0ms !important; animation-duration:0ms !important; }
 }
+/* ---- Ajuste para que la primera fila no quede oculta bajo el buscador ---- */
+.content {
+  /*  header: ~92px + notch (env)  */
+  padding-top: calc(110px + env(safe-area-inset-top, 0px));
+  display: grid;
+  gap: 12px;
+}
+
+/* Si el diseño cambia de altura en pantallas más grandes, ajustamos */
+@media (min-width: 600px) {
+  .content {
+    padding-top: calc(120px + env(safe-area-inset-top, 0px));
+  }
+}
