@@ -28,6 +28,25 @@
     "ruta_imagen": "imagenes/alb-ndigas-en-salsa.jpg"
   },
   {
+    "titulo": "Fabada asturiana",
+    "tipo": "principal",
+    "ingredientes": [
+      "100gr de fabes por persona",
+      "chorizo",
+      "morcilla",
+      "80gr de tocino",
+      "1/2 cebolla",
+      "1 cucharada de pimenton dulce",
+      "1 cucharada de harina",
+      "OPCIONAL: punta de jamon y azafran"
+    ],
+    "pasos": [
+      ""
+    ],
+    "consejos": ["Link de tiktok: https://vm.tiktok.com/ZNdK4fhMx/" ],
+    "ruta_imagen": "imagenes/fabada-asturiana.jpg"
+  },
+  {
     "titulo": "Arroz a la cubana",
     "tipo": "principal",
     "ingredientes": [
