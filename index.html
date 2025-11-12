@@ -11,7 +11,9 @@
     <div class="app-shell">
       <header class="app-header app-header--compact">
         <div class="header__brand">
-          <img src="images/logo.png" alt="" class="logo-mark" />
+          <span class="logo-wrap">
+            <img src="imagenes/logo.png" alt="" class="logo-mark" />
+          </span>
           <span class="logo">Recetario</span>
           <p class="tagline">Las mejores recetas de Cristina & Alberto</p>
         </div>
@@ -20,17 +22,36 @@
           <label class="search search--sm" for="search">
             <span class="sr-only">Buscar receta por nombre</span>
             <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
-              <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 4.99L20.49 19zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" fill="currentColor"></path>
+              <path
+                d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 4.99L20.49 19zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"
+                fill="currentColor"
+              ></path>
             </svg>
-            <input id="search" type="search" name="search" placeholder="Buscar receta por nombre" autocomplete="off" />
+            <input
+              id="search"
+              type="search"
+              name="search"
+              placeholder="Buscar receta por nombre"
+              autocomplete="off"
+            />
           </label>
 
           <div class="filter-group filter-group--compact" role="group" aria-label="Filtrar por tipo de plato">
-            <button type="button" class="filter-button filter-button--sm" data-filter-type="principal" aria-pressed="false">
+            <button
+              type="button"
+              class="filter-button filter-button--sm"
+              data-filter-type="principal"
+              aria-pressed="false"
+            >
               <span class="filter-button__label">Platos principales</span>
               <span class="filter-button__count" data-filter-count>0</span>
             </button>
-            <button type="button" class="filter-button filter-button--sm" data-filter-type="postre" aria-pressed="false">
+            <button
+              type="button"
+              class="filter-button filter-button--sm"
+              data-filter-type="postre"
+              aria-pressed="false"
+            >
               <span class="filter-button__label">Postres</span>
               <span class="filter-button__count" data-filter-count>0</span>
             </button>
@@ -53,7 +74,10 @@
       <article class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <button type="button" class="modal__close" aria-label="Cerrar detalles" data-dismiss="modal">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7a1 1 0 1 0-1.41 1.42L10.59 12l-4.89 4.88a1 1 0 1 0 1.41 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.41L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41z" fill="currentColor"></path>
+            <path
+              d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7a1 1 0 1 0-1.41 1.42L10.59 12l-4.89 4.88a1 1 0 1 0 1.41 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.41L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41z"
+              fill="currentColor"
+            ></path>
           </svg>
         </button>
         <div class="modal__body">
