@@ -36,7 +36,7 @@
       "chorizo",
       "morcilla",
       "80gr de tocino",
-      "1/2 cebolla",
+      "½ cebolla",
       "1 cucharada de pimenton dulce",
       "1 cucharada de harina",
       "OPCIONAL: punta de jamon y azafran"
@@ -45,7 +45,7 @@
       ""
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/fabada-asturiana.svg",
+    "ruta_imagen": "imagenes/fabada-asturiana.png",
     "foto": "",
     "link": "https://vm.tiktok.com/ZNdK4fhMx/"
   },
@@ -379,7 +379,7 @@
       "Pelar huevo. Sacarlo y pelarlo. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevo-duro-con-yema-liquida.svg",
+    "ruta_imagen": "imagenes/huevo-duro-con-yema-liquida.png",
     "foto": "",
     "link": ""
   },
@@ -389,7 +389,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevo-poche.svg",
+    "ruta_imagen": "imagenes/huevo-poche.png",
     "foto": "",
     "link": ""
   },
@@ -399,7 +399,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevos-rotos.svg",
+    "ruta_imagen": "imagenes/huevos-rotos.png",
     "foto": "",
     "link": ""
   },
@@ -409,7 +409,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/lasana-de-carne.svg",
+    "ruta_imagen": "imagenes/lasana-de-carne.png",
     "foto": "",
     "link": ""
   },
@@ -436,7 +436,7 @@
     "consejos": [
       "No hace falta sofreírlo, pero le da un toque extra."
     ],
-    "ruta_imagen": "imagenes/lentejas-con-verdura-pollo-y-chorizo.svg",
+    "ruta_imagen": "imagenes/lentejas-con-verdura-pollo-y-chorizo.png",
     "foto": "",
     "link": ""
   },
@@ -457,7 +457,7 @@
       "Cocer. Cubrir de agua y cocerlo durante 30 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/magro-con-tomate.svg",
+    "ruta_imagen": "imagenes/magro-con-tomate.png",
     "foto": "",
     "link": ""
   },
@@ -467,7 +467,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/migas-manchegas.svg",
+    "ruta_imagen": "imagenes/migas-manchegas.png",
     "foto": "",
     "link": ""
   },
@@ -477,7 +477,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa.svg",
+    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa.png",
     "foto": "",
     "link": ""
   },
@@ -487,7 +487,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa-de-cocacola.svg",
+    "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa-de-cocacola.png",
     "foto": "",
     "link": ""
   },
@@ -508,7 +508,7 @@
       "Soja. Ir echando salsa de soja y remover hasta que encontremos el sabor que queremos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/noodles-de-arroz-con-pollo-y-verduras.svg",
+    "ruta_imagen": "imagenes/noodles-de-arroz-con-pollo-y-verduras.png",
     "foto": "",
     "link": ""
   },
@@ -529,7 +529,7 @@
       "Ñoquis. Añadir ñoquis. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/noquis-con-salsa-de-queso-azul.svg",
+    "ruta_imagen": "imagenes/noquis-con-salsa-de-queso-azul.png",
     "foto": "",
     "link": ""
   },
@@ -539,7 +539,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/paella-del-luisma.svg",
+    "ruta_imagen": "imagenes/paella-del-luisma.png",
     "foto": "",
     "link": ""
   },
@@ -549,7 +549,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/palmeras-de-pizza.svg",
+    "ruta_imagen": "imagenes/palmeras-de-pizza.png",
     "foto": "",
     "link": ""
   },
@@ -575,7 +575,7 @@
       "Agua. Si queda muy compacto, echamos agua de cocción. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-carbonara.svg",
+    "ruta_imagen": "imagenes/pasta-carbonara.png",
     "foto": "",
     "link": ""
   },
@@ -594,7 +594,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-con-gulas.svg",
+    "ruta_imagen": "imagenes/pasta-con-gulas.png",
     "foto": "",
     "link": ""
   },
@@ -604,7 +604,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-di-mare.svg",
+    "ruta_imagen": "imagenes/pasta-di-mare.png",
     "foto": "",
     "link": ""
   },
@@ -666,7 +666,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pimiento-de-piquillo-relleno-de-bacalao.svg",
+    "ruta_imagen": "imagenes/pimiento-de-piquillo-relleno-de-bacalao.png",
     "foto": "",
     "link": ""
   },
@@ -705,7 +705,7 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pizza-con-burrata-y-pesto.svg",
+    "ruta_imagen": "imagenes/pizza-con-burrata-y-pesto.png",
     "foto": "",
     "link": ""
   },
@@ -715,7 +715,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pizza-de-arroz.svg",
+    "ruta_imagen": "imagenes/pizza-de-arroz.png",
     "foto": "",
     "link": ""
   },
@@ -733,7 +733,7 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pollo-con-almendras-y-miel.svg",
+    "ruta_imagen": "imagenes/pollo-con-almendras-y-miel.png",
     "foto": "",
     "link": ""
   },
@@ -743,7 +743,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/potaje-de-garbanzos-con-sepia.svg",
+    "ruta_imagen": "imagenes/potaje-de-garbanzos-con-sepia.png",
     "foto": "",
     "link": ""
   },
@@ -765,7 +765,7 @@
       "Triturar. Cuando esté blando, triturar hasta conseguir la textura que queremos."
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/pure-de-verduras.svg",
+    "ruta_imagen": "imagenes/pure-de-verduras.png",
     "foto": "",
     "link": ""
   },
@@ -790,7 +790,7 @@
       "Hervir. Hervir 6 minutos. Cerramos la olla exprés y cuando suba el pivote bajamos el fuego al 4. Dejar por lo menos 1 hora hervir. Lo abrimos y dejamos reposar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/rabo-de-toro.svg",
+    "ruta_imagen": "imagenes/rabo-de-toro.png",
     "foto": "",
     "link": ""
   },
@@ -813,7 +813,7 @@
       "Roll de espinacas, queso y salmón"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/ropa-vieja.svg",
+    "ruta_imagen": "imagenes/ropa-vieja.png",
     "foto": "",
     "link": ""
   },
@@ -841,7 +841,7 @@
       "Salmón horneado"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/roll-de-espinacas-queso-y-salmon.svg",
+    "ruta_imagen": "imagenes/roll-de-espinacas-queso-y-salmon.png",
     "foto": "",
     "link": ""
   },
@@ -861,7 +861,7 @@
       "Fin. Sacar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/salmon-horneado.svg",
+    "ruta_imagen": "imagenes/salmon-horneado.png",
     "foto": "",
     "link": ""
   },
@@ -886,7 +886,7 @@
       "Salsa. Cortar el secreto e incorporarlo. Echar un poco del agua de cocción. Echar la nata y el queso y terminar la salsa. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/secreto-con-salsa-de-setas-y-nata.svg",
+    "ruta_imagen": "imagenes/secreto-con-salsa-de-setas-y-nata.png",
     "foto": "",
     "link": ""
   },
@@ -910,7 +910,7 @@
       "Hornear. Al horno durante 20 minutos a 200º y retirar cuando esté dorado. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/secreto-relleno.svg",
+    "ruta_imagen": "imagenes/secreto-relleno.png",
     "foto": "",
     "link": ""
   },
@@ -920,7 +920,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/smashburger.svg",
+    "ruta_imagen": "imagenes/smashburger.png",
     "foto": "",
     "link": ""
   },
@@ -940,7 +940,7 @@
       "Hervir. Hervir 40 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/solomillo-con-tomatillas.svg",
+    "ruta_imagen": "imagenes/solomillo-con-tomatillas.png",
     "foto": "",
     "link": ""
   },
@@ -950,7 +950,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/sopa-de-pescado.svg",
+    "ruta_imagen": "imagenes/sopa-de-pescado.png",
     "foto": "",
     "link": ""
   },
@@ -960,7 +960,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/sushi-arroz.svg",
+    "ruta_imagen": "imagenes/sushi-arroz.png",
     "foto": "",
     "link": ""
   },
@@ -977,7 +977,7 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/sushi-kioto.svg",
+    "ruta_imagen": "imagenes/sushi-kioto.png",
     "foto": "",
     "link": ""
   },
@@ -997,7 +997,7 @@
       "Ideas: con sriracha mayo o con carbonara.",
       "Tacos de carne picada"
     ],
-    "ruta_imagen": "imagenes/sushi-new-york.svg",
+    "ruta_imagen": "imagenes/sushi-new-york.png",
     "foto": "",
     "link": ""
   },
@@ -1007,7 +1007,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tacos-de-carne-picada.svg",
+    "ruta_imagen": "imagenes/tacos-de-carne-picada.png",
     "foto": "",
     "link": ""
   },
@@ -1017,7 +1017,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tacos-de-carne-desmechada.svg",
+    "ruta_imagen": "imagenes/tacos-de-carne-desmechada.png",
     "foto": "",
     "link": ""
   },
@@ -1027,7 +1027,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tortilla-de-patata.svg",
+    "ruta_imagen": "imagenes/tortilla-de-patata.png",
     "foto": "",
     "link": ""
   },
@@ -1037,7 +1037,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tortilla-francesa.svg",
+    "ruta_imagen": "imagenes/tortilla-francesa.png",
     "foto": "",
     "link": ""
   },
@@ -1065,7 +1065,7 @@
     "consejos": [
       "¡Los tiempos de horno y no abrirlo son lo más importante!"
     ],
-    "ruta_imagen": "imagenes/bizcocho-de-yogurt.svg",
+    "ruta_imagen": "imagenes/bizcocho-de-yogurt.png",
     "foto": "",
     "link": ""
   },
@@ -1075,7 +1075,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/brownie.svg",
+    "ruta_imagen": "imagenes/brownie.png",
     "foto": "",
     "link": ""
   },
@@ -1085,7 +1085,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/crepes-con-chocolate.svg",
+    "ruta_imagen": "imagenes/crepes-con-chocolate.png",
     "foto": "",
     "link": ""
   },
@@ -1095,7 +1095,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/frozen-goiko-oreo.svg",
+    "ruta_imagen": "imagenes/frozen-goiko-oreo.png",
     "foto": "",
     "link": ""
   },
@@ -1118,7 +1118,7 @@
       "Hornear. En el horno a 200º, 10 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/galletas-de-avena.svg",
+    "ruta_imagen": "imagenes/galletas-de-avena.png",
     "foto": "",
     "link": ""
   },
@@ -1128,7 +1128,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/manzana-asada.svg",
+    "ruta_imagen": "imagenes/manzana-asada.png",
     "foto": "",
     "link": ""
   },
@@ -1138,7 +1138,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/palmeritas.svg",
+    "ruta_imagen": "imagenes/palmeritas.png",
     "foto": "",
     "link": ""
   },
@@ -1166,7 +1166,7 @@
     "consejos": [
       "No poner papel de horno en la base, ya que se pegará en la galleta. Aunque la veamos muy líquida, está bien, ya que luego cogerá consistencia."
     ],
-    "ruta_imagen": "imagenes/tarta-de-queso-con-chocolate-blanco.svg",
+    "ruta_imagen": "imagenes/tarta-de-queso-con-chocolate-blanco.png",
     "foto": "",
     "link": ""
   },
@@ -1176,7 +1176,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tartaleta-de-manzana.svg",
+    "ruta_imagen": "imagenes/tartaleta-de-manzana.png",
     "foto": "",
     "link": ""
   },
@@ -1186,7 +1186,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tarta-de-tres-chocolates.svg",
+    "ruta_imagen": "imagenes/tarta-de-tres-chocolates.png",
     "foto": "",
     "link": ""
   },
@@ -1196,7 +1196,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/tarta-de-zanahoria.svg",
+    "ruta_imagen": "imagenes/tarta-de-zanahoria.png",
     "foto": "",
     "link": ""
   },
@@ -1206,7 +1206,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/torrijas-de-la-abuela.svg",
+    "ruta_imagen": "imagenes/torrijas-de-la-abuela.png",
     "foto": "",
     "link": ""
   }
