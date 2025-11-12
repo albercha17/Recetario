@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Recetario familiar</title>
+    <title>Recetario C & A</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
   </head>
@@ -11,8 +11,9 @@
     <div class="app-shell">
       <header class="app-header app-header--compact">
         <div class="header__brand">
+          <img src="images/logo.png" alt="" class="logo-mark" />
           <span class="logo">Recetario</span>
-          <p class="tagline">Tus recetas siempre contigo</p>
+          <p class="tagline">Las mejores recetas de Cristina & Alberto</p>
         </div>
 
         <div class="header__controls header__controls--compact">
@@ -21,7 +22,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
               <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 4.99L20.49 19zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" fill="currentColor"></path>
             </svg>
-            <input id="search" type="search" name="search" placeholder="Buscar por nombre o ingrediente" autocomplete="off" />
+            <input id="search" type="search" name="search" placeholder="Buscar receta por nombre" autocomplete="off" />
           </label>
 
           <div class="filter-group filter-group--compact" role="group" aria-label="Filtrar por tipo de plato">
@@ -43,7 +44,6 @@
           <h2 id="empty-state-title"></h2>
           <p id="empty-state-message"></p>
         </section>
-
         <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
       </main>
     </div>
