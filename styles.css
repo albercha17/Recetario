@@ -27,32 +27,12 @@ body.no-scroll{overflow:hidden}
 /* Contenedor principal */
 .app-shell{width:min(100%,1120px);padding:20px clamp(14px,4vw,28px) 56px}
 
-/* ===========================
-   HEADER COMPACTO Y SIEMPRE ARRIBA
-   =========================== */
-.app-header{
-  background: var(--surface-strong);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(8px);
-}
-
-/* Versión compacta general (desktop/tablet) */
-.app-header--compact{
-  position: sticky;
-  top: 12px;
-  z-index: 10;
-  border-radius: var(--radius-lg);
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:10px;
-  padding:14px;
-}
-
+/* ===== Header compacto y fijo ===== */
+.app-header{background: var(--surface-strong);border: 1px solid var(--border-color);box-shadow: var(--shadow-sm);backdrop-filter: blur(8px)}
+.app-header--compact{position: sticky;top: 12px;z-index: 10;border-radius: var(--radius-lg);display:grid;grid-template-columns: 1fr;gap:10px;padding:14px}
 .header__brand{display:flex;align-items:baseline;gap:10px}
 .logo{margin:0;font-weight:700;letter-spacing:-.02em;font-size:22px}
 .tagline{margin:0;color:var(--text-secondary);font-size:12px}
-
 .header__controls--compact{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
 
 /* Buscador */
@@ -60,86 +40,18 @@ body.no-scroll{overflow:hidden}
 .search--sm{padding:8px 10px 8px 36px}
 .search:focus-within{border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.16)}
 .search__icon{position:absolute;left:12px;width:18px;height:18px;color:var(--text-muted)}
-/* Evita zoom en iOS al enfocar (≤16px provoca zoom) */
-.search input{flex:1;border:0;background:transparent;color:var(--text-primary);font: inherit;font-size:16px;outline:none}
+.search input{flex:1;border:0;background:transparent;color:var(--text-primary);font: inherit;font-size:16px;outline:none} /* 16px evita zoom iOS */
 .search input::placeholder{color:rgba(100,116,139,.7)}
 
 /* Filtros */
-.filter-group{
-  display:inline-flex;gap:8px;padding:6px;border-radius:999px;background:#fff;border:1px solid rgba(148,163,184,.28)
-}
+.filter-group{display:inline-flex;gap:8px;padding:6px;border-radius:999px;background:#fff;border:1px solid rgba(148,163,184,.28)}
 .filter-button{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(148,163,184,.24);border-radius:999px;padding:6px 12px;font:inherit;font-weight:600;color:var(--text-muted);background:rgba(148,163,184,.12);cursor:pointer;transition:transform var(--transition),background var(--transition),color var(--transition),border-color var(--transition)}
 .filter-button--sm{padding:6px 10px;font-size:13px}
 .filter-button.is-active{color:#fff;background:linear-gradient(135deg,#f97316,#fb923c 60%,#facc15);border-color:transparent}
 .filter-button__count{padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.6);color:var(--text-muted);font-size:12px;font-weight:600}
 
-/* ===========================
-   MÓVIL (iPhone / Safari)
-   Header fijo, MUY pequeño y con filtros en tira horizontal
-   =========================== */
-@media (max-width: 600px){
-  /* Header fijo arriba ocupando lo mínimo */
-  .app-header--compact{
-    position: fixed;
-    top: env(safe-area-inset-top, 0px);
-    left: 0; right: 0;
-    z-index: 1000;
-    border-radius: 0;
-    padding: 8px 10px;
-    margin: 0;
-  }
-
-  /* Espacio superior para que el contenido no quede detrás del header */
-  .app-shell{
-    padding-top: calc(70px + env(safe-area-inset-top, 0px));
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-bottom: 40px;
-    width: 100%;
-  }
-
-  .logo{font-size:18px}
-  .tagline{display:none}
-
-  .header__controls--compact{
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .search{
-    padding: 8px 10px 8px 34px;
-    border-radius: 12px;
-  }
-  .search__icon{left:10px;width:16px;height:16px}
-  .search input{font-size:16px; line-height: 1.2;}
-
-  /* Filtros en tira horizontal (no ocupan altura) */
-  .filter-group{
-    padding: 4px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.98);
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 6px;
-  }
-  .filter-group::-webkit-scrollbar{display:none}
-  .filter-button{padding:6px 10px;font-size:12px;white-space:nowrap}
-
-  /* Cards un poco más estrechas para que quepan más rápido en vertical */
-  .card-grid{gap:14px;grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));}
-  .recipe-card__image{aspect-ratio: 3/4;}
-}
-
-/* ===========================
-   CONTENIDO / CARDS / MODAL (igual que tenías, compacto)
-   =========================== */
+/* ===== Cards ===== */
 .content{display:grid;gap:16px}
-.empty-state{text-align:center;padding:28px 18px;border-radius:var(--radius-lg);border:1px dashed rgba(148,163,184,.35);background:rgba(255,255,255,.72);display:grid;gap:8px;justify-items:center}
-.empty-state__icon{font-size:28px}
-.empty-state h2{margin:0;font-size:18px}
-.empty-state p{margin:0;color:var(--text-muted);max-width:440px}
-
 .card-grid{display:grid;gap:clamp(16px,3vw,24px);grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .recipe-card{padding:0;border:0;border-radius:var(--radius-lg);background:var(--card-bg);overflow:hidden;cursor:pointer;color:inherit;transition:transform var(--transition),box-shadow var(--transition),background var(--transition);box-shadow:0 12px 28px rgba(148,163,184,.22);text-align:left;position:relative}
 .recipe-card:hover,.recipe-card:focus-visible{transform:translateY(-4px);background:var(--card-hover);box-shadow:var(--shadow-md)}
@@ -151,7 +63,7 @@ body.no-scroll{overflow:hidden}
 .recipe-card__title{position:relative;z-index:3;padding:0 14px 16px;font-size:16px;font-weight:600;color:#fff}
 .recipe-card__placeholder{position:absolute;inset:0;display:grid;place-items:center;font-size:36px;font-weight:600;color:rgba(255,255,255,.7);z-index:2}
 
-/* Botón link en tarjeta (ya lo tenías en mi versión previa) */
+/* Botón link en tarjeta */
 .recipe-card__linkbtn{
   position:absolute;right:10px;bottom:10px;z-index:4;
   display:inline-flex;align-items:center;gap:6px;
@@ -162,7 +74,7 @@ body.no-scroll{overflow:hidden}
 }
 .recipe-card__linkbtn svg{width:16px;height:16px}
 
-/* Modal (igual) */
+/* ===== Modal ===== */
 .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(12px,4vw,32px);z-index:20}
 .modal.active{display:flex}
 .modal__backdrop{position:absolute;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(12px)}
@@ -180,16 +92,78 @@ body.no-scroll{overflow:hidden}
 .recipe-section h3{margin:0;font-size:16px}
 .recipe-section p{margin:0;color:var(--text-muted);line-height:1.6;white-space:pre-wrap}
 .recipe-section ul{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--text-muted)}
-.modal__actions{display:flex;gap:12px;margin-top:4px}
+
+/* ===== Barra de acciones FIJA tipo app (iPhone) ===== */
+.modal__actions{
+  display:flex;gap:12px;margin-top:4px;
+}
 .button{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid rgba(148,163,184,.4);background:#fff;color:var(--text-primary);font-weight:600;text-decoration:none}
 .button--primary{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border-color:transparent}
 .button svg{width:18px;height:18px}
 
-/* Ajustes menores */
+/* iPhone: barra fija al borde inferior, con safe-area */
+@media (max-width: 600px){
+  /* Header súper compacto y fijo */
+  .app-header--compact{
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0; right: 0;
+    z-index: 1000;
+    border-radius: 0;
+    padding: 8px 10px;
+    margin: 0;
+  }
+  .app-shell{
+    padding-top: calc(70px + env(safe-area-inset-top, 0px));
+    padding-left: 12px; padding-right: 12px; padding-bottom: 40px;
+    width: 100%;
+  }
+  .logo{font-size:18px}
+  .tagline{display:none}
+  .header__controls--compact{grid-template-columns:1fr;gap:6px}
+  .search{padding:8px 10px 8px 34px;border-radius:12px}
+  .search__icon{left:10px;width:16px;height:16px}
+  .search input{font-size:16px;line-height:1.2}
+  .filter-group{
+    padding:4px;border-radius:999px;background:rgba(255,255,255,.98);
+    display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px
+  }
+  .filter-group::-webkit-scrollbar{display:none}
+  .filter-button{padding:6px 10px;font-size:12px;white-space:nowrap}
+
+  /* ---- Barra fija del modal ---- */
+  .modal__panel{max-height:100%;border-radius:16px 16px 0 0}
+  .modal__body{grid-template-columns:minmax(0,1fr)}
+  .modal__content{
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); /* hueco para la barra fija */
+  }
+  .modal__actions{
+    position: fixed; /* F I J A */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1200;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 20%, rgba(255,255,255,.98) 100%);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(148,163,184,.28);
+    box-shadow: 0 -16px 40px rgba(15,23,42,.18);
+    justify-content: center;
+    gap: 10px;
+  }
+  .modal__actions .button{
+    flex: 1;
+    min-height: 44px; /* tamaño cómodo dedo */
+    justify-content: center;
+    font-size: 16px; /* evita zoom iOS al tocar */
+  }
+}
+
+/* Ajustes extra */
 @media (max-width:720px){
   .modal{padding:10px}
   .modal__panel{border-radius:var(--radius-md)}
-  .modal__content{padding:16px}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition-duration:0ms!important;animation-duration:0ms!important}
