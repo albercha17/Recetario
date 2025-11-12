@@ -9,6 +9,11 @@
   const modalTitle = document.getElementById('modal-title');
   const modalSections = document.getElementById('modal-sections');
   const modalType = document.getElementById('modal-type');
+  const statsElements = {
+    total: document.getElementById('stat-total'),
+    principal: document.getElementById('stat-principal'),
+    postre: document.getElementById('stat-postre'),
+  };
   const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
   const filterButtons = Array.from(document.querySelectorAll('[data-filter-type]'));
 
@@ -39,6 +44,7 @@
           'Revisa que el archivo recipes.json esté en la raíz del repositorio y tenga el formato correcto.',
       });
       updateFilterCounts([]);
+      updateStats([]);
       updateFilterButtons();
     }
 
@@ -141,6 +147,14 @@
       .replace(/\p{Diacritic}/gu, '');
   }
 
+  function formatNumber(value) {
+    try {
+      return new Intl.NumberFormat('es-ES').format(value);
+    } catch (error) {
+      return String(value);
+    }
+  }
+
   function getTypeKey(value) {
     return normalizeText(value).replace(/\s+/g, '');
   }
@@ -225,9 +239,30 @@
         return;
       }
       const count = counts[key] ?? 0;
-      countEl.textContent = count;
+      countEl.textContent = formatNumber(count);
       button.setAttribute('data-count', String(count));
     });
+  }
+
+  function updateStats(recipes) {
+    const { total, principal, postre } = statsElements;
+    if (!total || !principal || !postre) {
+      return;
+    }
+
+    let principalCount = 0;
+    let postreCount = 0;
+    recipes.forEach((recipe) => {
+      if (recipe.typeKey === 'principal') {
+        principalCount += 1;
+      } else if (recipe.typeKey === 'postre') {
+        postreCount += 1;
+      }
+    });
+
+    total.textContent = formatNumber(recipes.length);
+    principal.textContent = formatNumber(principalCount);
+    postre.textContent = formatNumber(postreCount);
   }
 
   function applyFilters() {
@@ -240,6 +275,7 @@
         message: 'Añade tus recetas dentro de recipes.json para verlas aquí.',
       });
       updateFilterCounts([]);
+      updateStats([]);
       return;
     }
 
@@ -259,6 +295,7 @@
 
     state.filtered = filtered;
     renderCards(filtered);
+    updateStats(filtered);
     if (!filtered.length) {
       const message = query
         ? `No hay recetas que coincidan con “${query}”.`

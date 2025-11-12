@@ -10,11 +10,29 @@
   <body>
     <div class="app-shell">
       <header class="app-header">
-        <div class="header__brand">
-          <span class="logo">Recetario</span>
+        <div class="header__hero">
+          <span class="header__badge">Recetario familiar</span>
+          <h1 class="logo">Recetario</h1>
           <p class="tagline">Tus recetas siempre contigo</p>
+          <p class="header__subtitle">
+            Explora tus platos preferidos con una nueva interfaz más luminosa e intuitiva.
+          </p>
+          <div class="header__stats" aria-hidden="true">
+            <div class="stat">
+              <span class="stat__label">Recetas disponibles</span>
+              <span class="stat__value" id="stat-total">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat__label">Platos principales</span>
+              <span class="stat__value" id="stat-principal">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat__label">Postres</span>
+              <span class="stat__value" id="stat-postre">0</span>
+            </div>
+          </div>
         </div>
-        <div class="header__actions">
+        <div class="header__controls">
           <label class="search" for="search">
             <span class="sr-only">Buscar receta por nombre</span>
             <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
@@ -27,12 +45,13 @@
               id="search"
               type="search"
               name="search"
-              placeholder="Buscar por nombre"
+              placeholder="Buscar por nombre o ingrediente"
               autocomplete="off"
             />
           </label>
-          <div class="header__filters">
-            <div class="filter-group" role="group" aria-label="Filtrar por tipo de plato">
+          <div class="filter-panel">
+            <span class="filter-panel__label" id="filter-panel-label">Explora por tipo</span>
+            <div class="filter-group" role="group" aria-labelledby="filter-panel-label">
               <button
                 type="button"
                 class="filter-button"
