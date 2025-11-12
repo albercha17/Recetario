@@ -25,7 +25,8 @@
       "Hervir. Dejamos hervir al 4 durante 30 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/alb-ndigas-en-salsa.jpg"
+    "ruta_imagen": "imagenes/alb-ndigas-en-salsa.jpg",
+    "link": ""
   },
   {
     "titulo": "Fabada asturiana",
@@ -43,11 +44,10 @@
     "pasos": [
       ""
     ],
-    "consejos": [
-    ],
+    "consejos": [],
     "ruta_imagen": "imagenes/fabada-asturiana.svg",
     "foto": "",
-    "link":"https://vm.tiktok.com/ZNdK4fhMx/"
+    "link": "https://vm.tiktok.com/ZNdK4fhMx/"
   },
   {
     "titulo": "Arroz a la cubana",
@@ -71,7 +71,8 @@
       "Se pueden añadir unos tacos de jamón tostados en la airfryer.",
       "Tostar el arroz junto a los ajos le dará un toque de restaurante."
     ],
-    "ruta_imagen": "imagenes/IMG_9864.jpeg"
+    "ruta_imagen": "imagenes/IMG_9864.jpeg",
+    "link": ""
   },
   {
     "titulo": "Arroz blanco",
@@ -88,7 +89,8 @@
       "Reposar. Dejar reposar 5 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/arroz-blanco.jpg"
+    "ruta_imagen": "imagenes/arroz-blanco.jpg",
+    "link": ""
   },
   {
     "titulo": "Arroz con calamares",
@@ -113,7 +115,8 @@
       "Reposar. Dejar reposar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/arroz-con-calamares-jpg.png"
+    "ruta_imagen": "imagenes/arroz-con-calamares-jpg.png",
+    "link": ""
   },
   {
     "titulo": "Arroz con costillas",
@@ -121,7 +124,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/arroz-con-costillas.jpg"
+    "ruta_imagen": "imagenes/arroz-con-costillas.jpg",
+    "link": ""
   },
   {
     "titulo": "Arroz con pollo",
@@ -147,7 +151,8 @@
     "consejos": [
       "Un truco es echarle bastante aceite. Le dará mucho sabor y jugosidad. Tostar bien el pollo le dará un toque más potente al arroz."
     ],
-    "ruta_imagen": "imagenes/arroz-con-pollo.jpg"
+    "ruta_imagen": "imagenes/arroz-con-pollo.jpg",
+    "link": ""
   },
   {
     "titulo": "Arroz negro",
@@ -168,7 +173,8 @@
       "Abrimos la olla y dejamos reposar 5 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/arroz-negro.jpg"
+    "ruta_imagen": "imagenes/arroz-negro.jpg",
+    "link": ""
   },
   {
     "titulo": "Buñuelos de patata",
@@ -188,7 +194,8 @@
       "Sacar. Sacar y dejar enfriar. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/bunuelos-de-patatas.jpg"
+    "ruta_imagen": "imagenes/bunuelos-de-patatas.jpg",
+    "link": ""
   },
   {
     "titulo": "Carrilleras en salsa",
@@ -196,7 +203,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/Carrillerasensalsa.jpg"
+    "ruta_imagen": "imagenes/Carrillerasensalsa.jpg",
+    "link": ""
   },
   {
     "titulo": "Cocido madrileño",
@@ -223,7 +231,8 @@
     "consejos": [
       "Importante quitar la grasa antes de cerrar la olla."
     ],
-    "ruta_imagen": "imagenes/cocido-madrileno.jpg"
+    "ruta_imagen": "imagenes/cocido-madrileno.jpg",
+    "link": ""
   },
   {
     "titulo": "Cordero asado",
@@ -231,7 +240,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/Cordero-asado.jpg"
+    "ruta_imagen": "imagenes/Cordero-asado.jpg",
+    "link": ""
   },
   {
     "titulo": "Costillar a la barbacoa",
@@ -248,7 +258,8 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/costillar-a-la-barbacoa.jpg"
+    "ruta_imagen": "imagenes/costillar-a-la-barbacoa.jpg",
+    "link": ""
   },
   {
     "titulo": "Croquetas de cocido",
@@ -274,7 +285,8 @@
     "consejos": [
       "Es muy importante sofreír a fuego lento y sin dejar de mover."
     ],
-    "ruta_imagen": "imagenes/croquetas-de-cocido.jpg"
+    "ruta_imagen": "imagenes/croquetas-de-cocido.jpg",
+    "link": ""
   },
   {
     "titulo": "Fumet de gambones",
@@ -297,7 +309,8 @@
     "consejos": [
       "Es muy importante sofreír a fuego lento y sin dejar de mover."
     ],
-    "ruta_imagen": "imagenes/fumtet-de-gambones.jpg"
+    "ruta_imagen": "imagenes/fumtet-de-gambones.jpg",
+    "link": ""
   },
   {
     "titulo": "Gachas manchegas",
@@ -305,7 +318,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/gachas-manchegas.jpg"
+    "ruta_imagen": "imagenes/gachas-manchegas.jpg",
+    "link": ""
   },
   {
     "titulo": "Gambones al ajillo",
@@ -313,7 +327,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/gambones-al-ajillo.jpg"
+    "ruta_imagen": "imagenes/gambones-al-ajillo.jpg",
+    "link": ""
   },
   {
     "titulo": "Garbanzos con espinacas",
@@ -333,7 +348,8 @@
       "Añadir espinacas. Añadir pimienta, comino y pimentón. Añadir espinacas."
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/garbanzos-espinacas.jpg"
+    "ruta_imagen": "imagenes/garbanzos-espinacas.jpg",
+    "link": ""
   },
   {
     "titulo": "Huevo al plato",
@@ -347,7 +363,8 @@
     ],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevo-al-plato.jpg"
+    "ruta_imagen": "imagenes/huevo-al-plato.jpg",
+    "link": ""
   },
   {
     "titulo": "Huevo duro con yema líquida",
@@ -363,7 +380,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/huevo-duro-con-yema-liquida.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Huevo poché",
@@ -372,7 +390,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/huevo-poche.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Huevos rotos",
@@ -381,7 +400,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/huevos-rotos.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Lasaña de carne",
@@ -390,7 +410,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/lasana-de-carne.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Lentejas con verdura, pollo y chorizo",
@@ -416,7 +437,8 @@
       "No hace falta sofreírlo, pero le da un toque extra."
     ],
     "ruta_imagen": "imagenes/lentejas-con-verdura-pollo-y-chorizo.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Magro con tomate",
@@ -436,7 +458,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/magro-con-tomate.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Migas manchegas",
@@ -445,7 +468,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/migas-manchegas.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Muslos de pollo en salsa",
@@ -454,7 +478,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Muslos de pollo en salsa de cocacola",
@@ -463,7 +488,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/muslos-de-pollo-en-salsa-de-cocacola.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Noodles de arroz con pollo y verduras",
@@ -483,7 +509,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/noodles-de-arroz-con-pollo-y-verduras.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Ñoquis con salsa de queso azul",
@@ -503,7 +530,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/noquis-con-salsa-de-queso-azul.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Paella del Luisma",
@@ -512,7 +540,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/paella-del-luisma.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Palmeras de pizza",
@@ -521,7 +550,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/palmeras-de-pizza.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pasta carbonara",
@@ -546,7 +576,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/pasta-carbonara.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pasta al forno",
@@ -554,7 +585,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/pasta-al-forno.jpg"
+    "ruta_imagen": "imagenes/pasta-al-forno.jpg",
+    "link": ""
   },
   {
     "titulo": "Pasta con gulas",
@@ -563,7 +595,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pasta-con-gulas.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pasta Di Mare",
@@ -572,7 +605,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pasta-di-mare.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pastel de carne",
@@ -592,7 +626,8 @@
       "Horno. Meter en el horno con solo calor por arriba para que se tueste el queso. Máxima potencia. Una vez tostado, sacamos y dejamos reposar 5 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/pastel-de-carne.jpg"
+    "ruta_imagen": "imagenes/pastel-de-carne.jpg",
+    "link": ""
   },
   {
     "titulo": "Patatas con costillas",
@@ -613,7 +648,8 @@
       "Cocer. Cubrir bien con agua y sal y dejar cocer las costillas 45 minutos. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/patatas-con-costillas.jpg"
+    "ruta_imagen": "imagenes/patatas-con-costillas.jpg",
+    "link": ""
   },
   {
     "titulo": "Patatas revolconas",
@@ -621,7 +657,8 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/patatas-revolconas.jpg"
+    "ruta_imagen": "imagenes/patatas-revolconas.jpg",
+    "link": ""
   },
   {
     "titulo": "Pimiento de piquillo relleno de bacalao",
@@ -630,7 +667,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pimiento-de-piquillo-relleno-de-bacalao.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pimiento relleno de carne",
@@ -651,7 +689,8 @@
       "Gratinar. Lo meteremos en la airfryer o en el horno hasta que se dore. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/pimiento-relleno-de-carne.jpg"
+    "ruta_imagen": "imagenes/pimiento-relleno-de-carne.jpg",
+    "link": ""
   },
   {
     "titulo": "Pizza con burrata y pesto",
@@ -667,7 +706,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pizza-con-burrata-y-pesto.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pizza de arroz",
@@ -676,7 +716,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pizza-de-arroz.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Pollo con almendras y miel",
@@ -693,7 +734,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/pollo-con-almendras-y-miel.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Potaje de garbanzos con sepia",
@@ -702,7 +744,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/potaje-de-garbanzos-con-sepia.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Puré de verduras",
@@ -723,7 +766,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/pure-de-verduras.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Rabo de toro",
@@ -747,7 +791,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/rabo-de-toro.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Ropa vieja",
@@ -769,7 +814,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/ropa-vieja.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Roll de espinacas, queso y salmón",
@@ -796,7 +842,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/roll-de-espinacas-queso-y-salmon.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Salmón horneado",
@@ -815,7 +862,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/salmon-horneado.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Secreto con salsa de setas y nata",
@@ -839,7 +887,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/secreto-con-salsa-de-setas-y-nata.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Secreto relleno",
@@ -862,7 +911,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/secreto-relleno.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Smashburger",
@@ -871,7 +921,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/smashburger.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Solomillo con tomatillas",
@@ -890,7 +941,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/solomillo-con-tomatillas.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Sopa de pescado",
@@ -899,7 +951,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/sopa-de-pescado.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Sushi (arroz)",
@@ -908,7 +961,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/sushi-arroz.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Sushi Kioto",
@@ -924,7 +978,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/sushi-kioto.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Sushi New York",
@@ -943,7 +998,8 @@
       "Tacos de carne picada"
     ],
     "ruta_imagen": "imagenes/sushi-new-york.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tacos de carne picada",
@@ -952,7 +1008,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tacos-de-carne-picada.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tacos de carne desmechada",
@@ -961,7 +1018,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tacos-de-carne-desmechada.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tortilla de patata",
@@ -970,7 +1028,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tortilla-de-patata.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tortilla francesa",
@@ -979,7 +1038,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tortilla-francesa.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Bizcocho de yogurt",
@@ -1006,7 +1066,8 @@
       "¡Los tiempos de horno y no abrirlo son lo más importante!"
     ],
     "ruta_imagen": "imagenes/bizcocho-de-yogurt.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Brownie",
@@ -1015,7 +1076,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/brownie.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Crepes con chocolate",
@@ -1024,7 +1086,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/crepes-con-chocolate.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Frozen goiko oreo",
@@ -1033,7 +1096,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/frozen-goiko-oreo.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Galletas de avena",
@@ -1055,7 +1119,8 @@
     ],
     "consejos": [],
     "ruta_imagen": "imagenes/galletas-de-avena.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Manzana asada",
@@ -1064,7 +1129,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/manzana-asada.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Palmeritas",
@@ -1073,7 +1139,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/palmeritas.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tarta de queso con chocolate blanco",
@@ -1100,7 +1167,8 @@
       "No poner papel de horno en la base, ya que se pegará en la galleta. Aunque la veamos muy líquida, está bien, ya que luego cogerá consistencia."
     ],
     "ruta_imagen": "imagenes/tarta-de-queso-con-chocolate-blanco.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tartaleta de manzana",
@@ -1109,7 +1177,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tartaleta-de-manzana.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tarta de tres chocolates",
@@ -1118,7 +1187,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tarta-de-tres-chocolates.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Tarta de zanahoria",
@@ -1127,7 +1197,8 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/tarta-de-zanahoria.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   },
   {
     "titulo": "Torrijas de la abuela",
@@ -1136,6 +1207,7 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/torrijas-de-la-abuela.svg",
-    "foto": ""
+    "foto": "",
+    "link": ""
   }
 ]

@@ -9,11 +9,8 @@
   const modalTitle = document.getElementById('modal-title');
   const modalSections = document.getElementById('modal-sections');
   const modalType = document.getElementById('modal-type');
-  const statsElements = {
-    total: document.getElementById('stat-total'),
-    principal: document.getElementById('stat-principal'),
-    postre: document.getElementById('stat-postre'),
-  };
+  const modalActions = document.getElementById('modal-actions');
+
   const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
   const filterButtons = Array.from(document.querySelectorAll('[data-filter-type]'));
 
@@ -44,21 +41,17 @@
           'Revisa que el archivo recipes.json esté en la raíz del repositorio y tenga el formato correcto.',
       });
       updateFilterCounts([]);
-      updateStats([]);
-      updateFilterButtons();
     }
 
     searchInput.addEventListener('input', handleSearch);
     filterButtons.forEach((button) => {
       button.addEventListener('click', () => {
         const { filterType } = button.dataset;
-        if (!filterType) {
-          return;
-        }
+        if (!filterType) return;
         toggleTypeFilter(filterType);
       });
     });
-    updateFilterButtons();
+
     dismissButtons.forEach((button) => button.addEventListener('click', closeModal));
     modal.addEventListener('click', (event) => {
       if (event.target instanceof HTMLElement && event.target.dataset.dismiss === 'modal') {
@@ -74,9 +67,7 @@
 
   async function loadRecipes() {
     const response = await fetch('recipes.json');
-    if (!response.ok) {
-      throw new Error(`No se pudo obtener el archivo: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`No se pudo obtener el archivo: ${response.status}`);
 
     const payload = await response.json();
     const entries = Array.isArray(payload)
@@ -97,34 +88,27 @@
     const typeLabel = formatRecipeType(type);
 
     const ingredients = Array.isArray(entry.ingredientes)
-      ? entry.ingredientes.map((value) => String(value).trim()).filter(Boolean)
+      ? entry.ingredientes.map((v) => String(v).trim()).filter(Boolean)
       : [];
     const steps = Array.isArray(entry.pasos)
-      ? entry.pasos.map((value) => String(value).trim()).filter(Boolean)
+      ? entry.pasos.map((v) => String(v).trim()).filter(Boolean)
       : [];
 
     let tips = [];
-    if (Array.isArray(entry.consejos)) {
-      tips = entry.consejos.map((value) => String(value).trim()).filter(Boolean);
-    } else if (typeof entry.consejos === 'string') {
-      const tip = entry.consejos.trim();
-      if (tip) {
-        tips = [tip];
-      }
+    if (Array.isArray(entry.consejos)) tips = entry.consejos.map((v) => String(v).trim()).filter(Boolean);
+    else if (typeof entry.consejos === 'string') {
+      const t = entry.consejos.trim();
+      if (t) tips = [t];
     }
 
     const imagePath = typeof entry.ruta_imagen === 'string' ? entry.ruta_imagen.trim() : '';
     const imageName = typeof entry.foto === 'string' ? entry.foto.trim() : '';
+    let image = imagePath || (imageName ? (imageName.includes('/') ? imageName : `images/${imageName}`) : '');
 
-    let image = '';
-    if (imagePath) {
-      image = imagePath;
-    } else if (imageName) {
-      image = imageName.includes('/') ? imageName : `images/${imageName}`;
-    }
+    const link = typeof entry.link === 'string' ? entry.link.trim() : '';
 
     const searchParts = [rawTitle, type, typeLabel, ...ingredients, ...steps, ...tips]
-      .map((value) => normalizeText(value))
+      .map((v) => normalizeText(v))
       .filter(Boolean);
 
     return {
@@ -136,74 +120,35 @@
       steps,
       tips,
       image,
+      link,
       searchText: searchParts.join(' '),
     };
   }
 
-  function normalizeText(value) {
-    return String(value || '')
+  const normalizeText = (value) =>
+    String(value || '')
       .toLocaleLowerCase('es')
       .normalize('NFD')
       .replace(/\p{Diacritic}/gu, '');
-  }
 
-  function formatNumber(value) {
-    try {
-      return new Intl.NumberFormat('es-ES').format(value);
-    } catch (error) {
-      return String(value);
-    }
-  }
-
-  function getTypeKey(value) {
-    return normalizeText(value).replace(/\s+/g, '');
-  }
+  const getTypeKey = (v) => normalizeText(v).replace(/\s+/g, '');
 
   function formatRecipeType(value) {
     const key = getTypeKey(value);
-    if (!key) {
-      return '';
-    }
-
-    if (key === 'principal') {
-      return 'Plato principal';
-    }
-
-    if (key === 'postre') {
-      return 'Postre';
-    }
-
-    if (key === 'desconocido') {
-      return 'Desconocido';
-    }
-
-    return capitalize(value);
+    if (!key) return '';
+    if (key === 'principal') return 'Plato principal';
+    if (key === 'postre') return 'Postre';
+    if (key === 'desconocido') return 'Desconocido';
+    return value.charAt(0).toLocaleUpperCase('es') + value.slice(1);
   }
 
-  function capitalize(value) {
-    const text = String(value || '').trim();
-    if (!text) {
-      return '';
-    }
-    return text.charAt(0).toLocaleUpperCase('es') + text.slice(1);
-  }
-
-  function handleSearch() {
-    applyFilters();
-  }
+  function handleSearch() { applyFilters(); }
 
   function toggleTypeFilter(type) {
     const key = getTypeKey(type);
-    if (!key) {
-      return;
-    }
-
-    if (state.activeTypes.has(key)) {
-      state.activeTypes.delete(key);
-    } else {
-      state.activeTypes.add(key);
-    }
-
+    if (!key) return;
+    if (state.activeTypes.has(key)) state.activeTypes.delete(key);
+    else state.activeTypes.add(key);
     updateFilterButtons();
     applyFilters();
   }
@@ -219,50 +164,19 @@
 
   function updateFilterCounts(recipes) {
     const counts = {};
-    filterButtons.forEach((button) => {
-      const key = getTypeKey(button.dataset.filterType || '');
-      if (key) {
-        counts[key] = 0;
-      }
+    filterButtons.forEach((b) => {
+      const key = getTypeKey(b.dataset.filterType || '');
+      if (key) counts[key] = 0;
     });
-
-    recipes.forEach((recipe) => {
-      if (recipe.typeKey && Object.prototype.hasOwnProperty.call(counts, recipe.typeKey)) {
-        counts[recipe.typeKey] += 1;
-      }
+    (recipes || []).forEach((r) => {
+      if (r.typeKey && Object.prototype.hasOwnProperty.call(counts, r.typeKey)) counts[r.typeKey] += 1;
     });
-
-    filterButtons.forEach((button) => {
-      const countEl = button.querySelector('[data-filter-count]');
-      const key = getTypeKey(button.dataset.filterType || '');
-      if (!countEl || !key) {
-        return;
-      }
-      const count = counts[key] ?? 0;
-      countEl.textContent = formatNumber(count);
-      button.setAttribute('data-count', String(count));
+    filterButtons.forEach((b) => {
+      const countEl = b.querySelector('[data-filter-count]');
+      const key = getTypeKey(b.dataset.filterType || '');
+      if (!countEl || !key) return;
+      countEl.textContent = String(counts[key] ?? 0);
     });
-  }
-
-  function updateStats(recipes) {
-    const { total, principal, postre } = statsElements;
-    if (!total || !principal || !postre) {
-      return;
-    }
-
-    let principalCount = 0;
-    let postreCount = 0;
-    recipes.forEach((recipe) => {
-      if (recipe.typeKey === 'principal') {
-        principalCount += 1;
-      } else if (recipe.typeKey === 'postre') {
-        postreCount += 1;
-      }
-    });
-
-    total.textContent = formatNumber(recipes.length);
-    principal.textContent = formatNumber(principalCount);
-    postre.textContent = formatNumber(postreCount);
   }
 
   function applyFilters() {
@@ -275,7 +189,6 @@
         message: 'Añade tus recetas dentro de recipes.json para verlas aquí.',
       });
       updateFilterCounts([]);
-      updateStats([]);
       return;
     }
 
@@ -284,27 +197,23 @@
 
     let filtered = state.recipes;
     if (normalizedQuery) {
-      filtered = filtered.filter((recipe) => recipe.searchText.includes(normalizedQuery));
+      filtered = filtered.filter((r) => r.searchText.includes(normalizedQuery));
     }
 
     updateFilterCounts(filtered);
 
     if (state.activeTypes.size) {
-      filtered = filtered.filter((recipe) => state.activeTypes.has(recipe.typeKey));
+      filtered = filtered.filter((r) => state.activeTypes.has(r.typeKey));
     }
 
     state.filtered = filtered;
     renderCards(filtered);
-    updateStats(filtered);
+
     if (!filtered.length) {
       const message = query
         ? `No hay recetas que coincidan con “${query}”.`
         : 'No hay recetas registradas en este momento.';
-      setEmptyState({
-        visible: true,
-        title: 'Sin resultados',
-        message,
-      });
+      setEmptyState({ visible: true, title: 'Sin resultados', message });
     } else {
       setEmptyState({ visible: false });
     }
@@ -324,18 +233,10 @@
 
   function renderCards(recipes) {
     cardsContainer.innerHTML = '';
-
-    if (!recipes.length) {
-      return;
-    }
+    if (!recipes.length) return;
 
     const fragment = document.createDocumentFragment();
-
-    recipes.forEach((recipe) => {
-      const card = createRecipeCard(recipe);
-      fragment.appendChild(card);
-    });
-
+    recipes.forEach((recipe) => fragment.appendChild(createRecipeCard(recipe)));
     cardsContainer.appendChild(fragment);
   }
 
@@ -344,9 +245,7 @@
     card.type = 'button';
     card.className = 'recipe-card';
     card.dataset.hasImage = recipe.image ? 'true' : 'false';
-    if (recipe.typeKey) {
-      card.setAttribute('data-type', recipe.typeKey);
-    }
+    if (recipe.typeKey) card.setAttribute('data-type', recipe.typeKey);
     card.setAttribute('aria-label', `Ver detalles de ${recipe.title}`);
 
     const image = document.createElement('div');
@@ -394,9 +293,7 @@
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('no-scroll');
     const closeButton = modal.querySelector('.modal__close');
-    if (closeButton instanceof HTMLElement) {
-      closeButton.focus();
-    }
+    if (closeButton instanceof HTMLElement) closeButton.focus();
   }
 
   function closeModal() {
@@ -404,9 +301,7 @@
     modal.classList.add('hidden');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('no-scroll');
-    if (lastFocusedElement) {
-      lastFocusedElement.focus();
-    }
+    if (lastFocusedElement) lastFocusedElement.focus();
   }
 
   function populateModal(recipe) {
@@ -437,25 +332,37 @@
     }
 
     modalSections.innerHTML = '';
-
     const sections = [];
-    if (recipe.ingredients.length) {
-      sections.push(createListSection('Ingredientes', recipe.ingredients));
-    }
-    if (recipe.steps.length) {
-      sections.push(createListSection('Pasos', recipe.steps));
-    }
-    if (recipe.tips.length) {
-      sections.push(createParagraphSection('Consejos', recipe.tips));
-    }
+    if (recipe.ingredients.length) sections.push(createListSection('Ingredientes', recipe.ingredients));
+    if (recipe.steps.length) sections.push(createListSection('Pasos', recipe.steps));
+    if (recipe.tips.length) sections.push(createParagraphSection('Consejos', recipe.tips));
 
-    if (sections.length) {
-      sections.forEach((section) => modalSections.appendChild(section));
-    } else {
+    if (sections.length) sections.forEach((s) => modalSections.appendChild(s));
+    else {
       const empty = document.createElement('p');
       empty.className = 'modal__empty';
       empty.textContent = 'No hay información disponible para esta receta.';
       modalSections.appendChild(empty);
+    }
+
+    // Acciones (botón a link si existe)
+    modalActions.innerHTML = '';
+    if (recipe.link) {
+      const linkBtn = document.createElement('a');
+      linkBtn.href = recipe.link;
+      linkBtn.target = '_blank';
+      linkBtn.rel = 'noopener noreferrer';
+      linkBtn.className = 'button button--primary';
+      linkBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" fill="currentColor"></path>
+        </svg>
+        <span>Ver receta online</span>
+      `;
+      modalActions.appendChild(linkBtn);
+      modalActions.hidden = false;
+    } else {
+      modalActions.hidden = true;
     }
   }
 
