@@ -813,7 +813,7 @@
       "Roll de espinacas, queso y salmón"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/ropa-vieja.png",
+    "ruta_imagen": "imagenes/ropa-vieja.png.png",
     "foto": "",
     "link": ""
   },
@@ -994,8 +994,7 @@
     ],
     "pasos": [],
     "consejos": [
-      "Ideas: con sriracha mayo o con carbonara.",
-      "Tacos de carne picada"
+      "Ideas: con sriracha mayo o con carbonara."
     ],
     "ruta_imagen": "imagenes/sushi-new-york.png",
     "foto": "",
@@ -1207,6 +1206,16 @@
     "pasos": [],
     "consejos": [],
     "ruta_imagen": "imagenes/torrijas-de-la-abuela.png",
+    "foto": "",
+    "link": ""
+  },
+  {
+    "titulo": "Torrijas de la abuela",
+    "tipo": "postre",
+    "ingredientes": [],
+    "pasos": [],
+    "consejos": [],
+    "ruta_imagen": "imagenes/tarta-de-la-abuela.png",
     "foto": "",
     "link": ""
   }
