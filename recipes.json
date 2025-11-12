@@ -379,7 +379,7 @@
       "Pelar huevo. Sacarlo y pelarlo. ¡A comer!"
     ],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevo-duro-con-yema-liquida.png",
+    "ruta_imagen": "imagenes/huevo-duro-con-yema-líquida.jpg",
     "foto": "",
     "link": ""
   },
@@ -389,7 +389,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevo-poche.png",
+    "ruta_imagen": "imagenes/huevo-poche.jpg",
     "foto": "",
     "link": ""
   },
@@ -399,7 +399,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/huevos-rotos.png",
+    "ruta_imagen": "imagenes/huevos-roto.jpg",
     "foto": "",
     "link": ""
   },
@@ -409,7 +409,7 @@
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
-    "ruta_imagen": "imagenes/lasana-de-carne.png",
+    "ruta_imagen": "imagenes/lasana-de-carne.jpg",
     "foto": "",
     "link": ""
   },
