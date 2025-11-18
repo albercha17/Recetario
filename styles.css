@@ -10,13 +10,13 @@
 html,
 body {
   height: 100%;
-  overflow: hidden;
+  overflow: hidden; /* el scroll real va en .content para evitar el “doble header” en iOS */
 }
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #15192f 0, #050713 55%, #02030a 100%);
+  background: radial-gradient(circle at top, #101429 0, #050712 55%, #02010a 100%);
   color: #f9fafb;
   -webkit-font-smoothing: antialiased;
 }
@@ -31,17 +31,15 @@ body {
 
 /* Header */
 .app-header {
-  background: linear-gradient(135deg, #080c1a, #050814);
-  border-radius: 20px;
-  padding: 0.75rem 0.9rem 0.85rem;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
-  /* antes estaba sticky; lo quitamos para evitar el “doble header” en iOS */
-  /* position: sticky;
-  top: 0; */
+  background: radial-gradient(circle at top left, rgba(17, 24, 39, 0.94), rgba(3, 7, 18, 0.98));
+  border-radius: 24px;
+  padding: 0.75rem 0.9rem 0.9rem;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 .app-header--compact {
-  border-radius: 0 0 20px 20px;
+  border-radius: 18px 18px 22px 22px;
 }
 
 .header__brand {
@@ -52,12 +50,13 @@ body {
 }
 
 .logo-wrap {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(248, 250, 252, 0.7);
   flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9);
 }
 
 .logo-mark {
@@ -73,15 +72,15 @@ body {
 }
 
 .logo {
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .tagline {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: #a5b4fc;
 }
 
 /* Controles */
@@ -98,9 +97,9 @@ body {
   display: flex;
   align-items: center;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  padding: 0.2rem 0.9rem 0.2rem 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
+  padding: 0.25rem 0.9rem 0.25rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
 }
 
 .search--sm {
@@ -139,12 +138,53 @@ body {
   border: 0;
 }
 
-/* Filtros */
+/* Botón de filtros */
+.filters-toggle {
+  margin-top: 0.15rem;
+  border-radius: 999px;
+  border: none;
+  width: 100%;
+  padding: 0.35rem 0.8rem;
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(59, 130, 246, 0.92));
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 14px 35px rgba(37, 99, 235, 0.55);
+}
+
+.filters-toggle__label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.filters-toggle__summary {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+}
+
+/* Panel de filtros */
+.filters-panel {
+  margin-top: 0.45rem;
+  padding: 0.4rem 0.2rem 0.1rem;
+  border-radius: 18px;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+  border: 1px solid rgba(30, 64, 175, 0.45);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+}
+
+/* Filtros internos */
 .filter-group {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.45rem;
-  margin-top: 0.2rem;
 }
 
 .filter-group--compact {
@@ -160,7 +200,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.25rem;
-  background: radial-gradient(circle at top left, #1f2937, #020617);
+  background: radial-gradient(circle at top left, #111827, #020617);
   color: #e5e7eb;
   cursor: pointer;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
@@ -195,18 +235,13 @@ body {
   color: #111827;
 }
 
-.filter-spacer {
-  visibility: hidden;
-}
-
 /* Contenido principal */
 .content {
   margin-top: 0.65rem;
-  overflow-y: auto;      /* ← Añadir */
-  -webkit-overflow-scrolling: touch; /* ← Añadir */
-  height: calc(100vh - 180px); /* ← Ajusta el valor si tu header cambia de tamaño */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  height: calc(100vh - 190px); /* altura disponible bajo el header */
 }
-
 
 /* Estado vacío */
 .empty-state {
@@ -228,7 +263,7 @@ body {
   gap: 0.7rem;
 }
 
-/* En pantallas más grandes aumentamos columnas */
+/* Más columnas en pantallas grandes */
 @media (min-width: 640px) {
   .card-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -245,8 +280,9 @@ body {
 .card {
   border-radius: 18px;
   overflow: hidden;
-  background: radial-gradient(circle at top, #111827, #020617);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+  background: radial-gradient(circle at top, #020617, #020617);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.9);
 }
 
 .card__inner {
@@ -328,6 +364,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.8);
 }
 
 .modal__close {
@@ -437,7 +474,7 @@ body {
   color: #111827;
 }
 
-/* Scrollbar sutil en modal */
+/* Scrollbar modal */
 .sections::-webkit-scrollbar {
   width: 4px;
 }

@@ -1,366 +1,388 @@
-// app.js
-
-// ---- Utilidades de tipos ----
-function normalizarTipos(recipe) {
-  const t = recipe.tipo;
-  if (Array.isArray(t)) {
-    return t
-      .map((x) => String(x).trim())
-      .filter((x) => x.length > 0);
-  }
-  if (typeof t === "string" && t.trim() !== "") {
-    return [t.trim()];
-  }
-  return [];
-}
-
-function formatearEtiqueta(tipo) {
-  const lower = tipo.toLowerCase();
-  if (lower === "principal") return "Principal";
-  if (lower === "postre") return "Postre";
-  return tipo.charAt(0).toUpperCase() + tipo.slice(1);
-}
-
-// ---- Estado global ----
-let todasLasRecetas = [];
-let recetasFiltradas = [];
-let filtroActivo = null; // null = sin filtro → todas
-let terminoBusqueda = "";
-
-// ---- DOM ----
+// Elementos básicos
 const cardsContainer = document.getElementById("cards");
 const emptyState = document.getElementById("empty-state");
 const emptyTitle = document.getElementById("empty-state-title");
 const emptyMessage = document.getElementById("empty-state-message");
-const searchInput = document.getElementById("search");
-const filterGroup = document.getElementById("filter-group");
 
+const searchInput = document.getElementById("search");
+
+const filtersToggle = document.getElementById("filters-toggle");
+const filtersPanel = document.getElementById("filters-panel");
+const filtersContainer = document.getElementById("filters-container");
+const filtersSummary = document.getElementById("filters-summary");
+
+// Modal
 const modal = document.getElementById("modal");
-const modalBackdrop = modal.querySelector(".modal__backdrop");
-const modalClose = modal.querySelector(".modal__close");
+const modalGallery = document.getElementById("modal-gallery");
 const modalTitle = document.getElementById("modal-title");
 const modalType = document.getElementById("modal-type");
 const modalSections = document.getElementById("modal-sections");
-const modalGallery = document.getElementById("modal-gallery");
 const modalActions = document.getElementById("modal-actions");
 
-// ---- Inicio ----
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("recipes.json") // cambia el nombre si tu archivo se llama distinto
-    .then((res) => {
-      if (!res.ok) throw new Error("No se pudo cargar recipes.json");
-      return res.json();
-    })
-    .then((data) => {
-      todasLasRecetas = Array.isArray(data) ? data : [];
-      recetasFiltradas = [...todasLasRecetas];
+// Estado
+let allRecipes = [];
+let activeTypes = new Set();
+let searchTerm = "";
 
-      inicializarFiltros(todasLasRecetas);
-      configurarBuscador();
-      renderizarRecetas(recetasFiltradas);
-    })
-    .catch((err) => {
-      console.error(err);
-      mostrarEstadoVacio(
-        "No se han podido cargar las recetas",
-        "Comprueba que el archivo recipes.json está en la ruta correcta."
-      );
+let typeStats = new Map(); // tipo -> recuento
+
+// Utils
+function normaliseTypes(tipo) {
+  if (Array.isArray(tipo)) return tipo.filter(Boolean).map((t) => t.toLowerCase());
+  if (typeof tipo === "string" && tipo.trim() !== "") {
+    return [tipo.trim().toLowerCase()];
+  }
+  return [];
+}
+
+function capitalize(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function hasActiveFilters() {
+  return activeTypes.size > 0;
+}
+
+// Carga de datos
+async function loadRecipes() {
+  const res = await fetch("recipes.json");
+  const data = await res.json();
+  allRecipes = data;
+
+  // Calcular estadísticas de tipos
+  typeStats = new Map();
+  allRecipes.forEach((recipe) => {
+    const tipos = normaliseTypes(recipe.tipo);
+    tipos.forEach((t) => {
+      typeStats.set(t, (typeStats.get(t) || 0) + 1);
     });
-
-  configurarModal();
-});
-
-// ---- Filtros dinámicos (con primera fila fija) ----
-function inicializarFiltros(recetas) {
-  const conteoTipos = new Map();
-
-  recetas.forEach((receta) => {
-    const tipos = normalizarTipos(receta);
-    tipos.forEach((tipo) => {
-      const key = tipo;
-      conteoTipos.set(key, (conteoTipos.get(key) || 0) + 1);
-    });
   });
 
-  const tiposDisponibles = Array.from(conteoTipos.keys());
+  buildFilterButtons();
+  applyFilters();
+}
 
-  filterGroup.innerHTML = "";
+// Construir filtros dinámicos
+function buildFilterButtons() {
+  const allTypesSet = new Set();
 
-  const prioridad = ["principal", "postre"];
-
-  // 1) Filtros de prioridad (primera fila)
-  prioridad.forEach((clave) => {
-    const tipoReal = tiposDisponibles.find(
-      (t) => t.toLowerCase() === clave.toLowerCase()
-    );
-    if (!tipoReal) return;
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "filter-button filter-button--sm";
-    btn.dataset.filterType = tipoReal;
-    btn.setAttribute("aria-pressed", "false");
-    btn.innerHTML = `
-      <span class="filter-button__label">${formatearEtiqueta(tipoReal)}</span>
-      <span class="filter-button__count" data-filter-count>${
-        conteoTipos.get(tipoReal) || 0
-      }</span>
-    `;
-    filterGroup.appendChild(btn);
+  allRecipes.forEach((recipe) => {
+    normaliseTypes(recipe.tipo).forEach((t) => allTypesSet.add(t));
   });
 
-  // 2) Hueco fantasma para que la primera fila tenga SOLO esos dos
-  const spacer = document.createElement("div");
-  spacer.className = "filter-spacer";
-  spacer.setAttribute("aria-hidden", "true");
-  filterGroup.appendChild(spacer);
+  const allTypes = Array.from(allTypesSet);
 
-  // 3) Resto de tipos, ordenados alfabéticamente
-  const resto = tiposDisponibles
-    .filter(
-      (t) =>
-        !prioridad.some((p) => p.toLowerCase() === t.toLowerCase())
-    )
-    .sort((a, b) =>
-      a.localeCompare(b, "es", { sensitivity: "base" })
-    );
+  const primary = [];
+  const others = [];
 
-  resto.forEach((tipo) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "filter-button filter-button--sm";
-    btn.dataset.filterType = tipo;
-    btn.setAttribute("aria-pressed", "false");
-    btn.innerHTML = `
-      <span class="filter-button__label">${formatearEtiqueta(tipo)}</span>
-      <span class="filter-button__count" data-filter-count>${
-        conteoTipos.get(tipo) || 0
-      }</span>
-    `;
-    filterGroup.appendChild(btn);
-  });
-
-  // 4) Evento de click (un solo filtro activo; click otra vez = limpiar filtro)
-  filterGroup.addEventListener("click", (event) => {
-    const button = event.target.closest("button[data-filter-type]");
-    if (!button) return;
-
-    const type = button.dataset.filterType;
-
-    // Si clicas el mismo filtro que estaba activo → se desactiva (ver todas)
-    if (filtroActivo === type) {
-      filtroActivo = null;
-      filterGroup
-        .querySelectorAll("button[data-filter-type]")
-        .forEach((btn) => {
-          btn.classList.remove("is-active");
-          btn.setAttribute("aria-pressed", "false");
-        });
+  allTypes.forEach((t) => {
+    if (t === "principal" || t === "postre") {
+      primary.push(t);
     } else {
-      filtroActivo = type;
-      filterGroup
-        .querySelectorAll("button[data-filter-type]")
-        .forEach((btn) => {
-          const isActive = btn === button;
-          btn.classList.toggle("is-active", isActive);
-          btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-        });
+      others.push(t);
     }
+  });
 
-    aplicarFiltros();
+  others.sort((a, b) => a.localeCompare(b, "es"));
+
+  const ordered = [...primary, ...others];
+
+  filtersContainer.innerHTML = "";
+
+  ordered.forEach((type) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "filter-button filter-button--sm";
+    btn.dataset.filterType = type;
+
+    const label = type === "principal" ? "Principal" :
+                  type === "postre" ? "Postre" :
+                  capitalize(type);
+
+    const count = typeStats.get(type) || 0;
+
+    btn.innerHTML = `
+      <span class="filter-button__label">${label}</span>
+      <span class="filter-button__count" data-filter-count>${count}</span>
+    `;
+
+    filtersContainer.appendChild(btn);
   });
 }
 
-// ---- Buscador ----
-function configurarBuscador() {
-  searchInput.addEventListener("input", () => {
-    terminoBusqueda = searchInput.value.trim().toLowerCase();
-    aplicarFiltros();
-  });
+// Aplicar búsqueda + filtros
+function recipeMatches(recipe) {
+  const tipos = normaliseTypes(recipe.tipo);
+
+  // Filtro por tipos
+  if (activeTypes.size > 0) {
+    const match = tipos.some((t) => activeTypes.has(t));
+    if (!match) return false;
+  }
+
+  // Filtro por búsqueda
+  if (searchTerm.trim() !== "") {
+    const term = searchTerm.toLowerCase();
+    const haystack = [
+      recipe.titulo || "",
+      ...(recipe.ingredientes || []),
+      ...(recipe.consejos || [])
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    if (!haystack.includes(term)) return false;
+  }
+
+  return true;
 }
 
-// ---- Aplicar filtros ----
-function aplicarFiltros() {
-  recetasFiltradas = todasLasRecetas.filter((receta) => {
-    const titulo = (receta.titulo || "").toLowerCase();
-    const coincideBusqueda =
-      terminoBusqueda === "" || titulo.includes(terminoBusqueda);
-
-    const tipos = normalizarTipos(receta);
-    const coincideTipo = !filtroActivo || tipos.includes(filtroActivo);
-
-    return coincideBusqueda && coincideTipo;
-  });
-
-  renderizarRecetas(recetasFiltradas);
+function applyFilters() {
+  const visible = allRecipes.filter(recipeMatches);
+  renderCards(visible);
+  updateEmptyState(visible.length);
+  updateFiltersSummary();
 }
 
-// ---- Render tarjetas ----
-function renderizarRecetas(recetas) {
+// Render tarjetas
+function renderCards(recipes) {
   cardsContainer.innerHTML = "";
 
-  if (!recetas || recetas.length === 0) {
-    mostrarEstadoVacio(
-      "No hay resultados",
-      "Prueba a quitar algún filtro o a buscar otro nombre."
-    );
+  recipes.forEach((recipe, index) => {
+    const card = document.createElement("article");
+    card.className = "card";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card__inner";
+    btn.dataset.index = index; // índice relativo al filtrado? mejor guardar id
+    // Usaremos dataset.id con título único
+    btn.dataset.title = recipe.titulo;
+
+    const imageWrap = document.createElement("div");
+    imageWrap.className = "card__image-wrap";
+
+    const img = document.createElement("img");
+    img.className = "card__image";
+    img.alt = recipe.titulo || "Receta";
+
+    if (recipe.ruta_imagen) {
+      img.src = recipe.ruta_imagen;
+    } else {
+      img.classList.add("card__image--placeholder");
+    }
+
+    imageWrap.appendChild(img);
+
+    const body = document.createElement("div");
+    body.className = "card__body";
+
+    const title = document.createElement("h3");
+    title.className = "card__title";
+    title.textContent = recipe.titulo || "Receta";
+
+    const tipos = normaliseTypes(recipe.tipo);
+    const meta = document.createElement("p");
+    meta.className = "card__meta";
+
+    if (tipos.length > 0) {
+      const label = tipos
+        .map((t) => (t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)))
+        .join(" · ");
+      meta.textContent = label;
+    } else {
+      meta.textContent = "Sin categoría";
+    }
+
+    body.appendChild(title);
+    body.appendChild(meta);
+
+    btn.appendChild(imageWrap);
+    btn.appendChild(body);
+    card.appendChild(btn);
+
+    cardsContainer.appendChild(card);
+
+    // Click abre modal
+    btn.addEventListener("click", () => openModal(recipe));
+  });
+}
+
+function updateEmptyState(count) {
+  if (count === 0) {
+    emptyState.hidden = false;
+    emptyTitle.textContent = "Sin resultados";
+    if (hasActiveFilters() || searchTerm.trim() !== "") {
+      emptyMessage.textContent =
+        "Prueba a quitar filtros o a buscar otro nombre / ingrediente.";
+    } else {
+      emptyMessage.textContent =
+        "Añade recetas a tu JSON para verlas aquí.";
+    }
+  } else {
+    emptyState.hidden = true;
+  }
+}
+
+function updateFiltersSummary() {
+  if (!hasActiveFilters()) {
+    filtersSummary.textContent = "Sin filtros";
     return;
   }
 
-  ocultarEstadoVacio();
+  const names = Array.from(activeTypes).map((t) =>
+    t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)
+  );
 
-  const frag = document.createDocumentFragment();
-  recetas.forEach((receta, index) => {
-    frag.appendChild(crearTarjeta(receta, index));
-  });
-  cardsContainer.appendChild(frag);
+  if (names.length <= 2) {
+    filtersSummary.textContent = names.join(" · ");
+  } else {
+    filtersSummary.textContent = `${names[0]}, ${names[1]} +${names.length - 2}`;
+  }
 }
 
-function crearTarjeta(receta, index) {
-  const tipos = normalizarTipos(receta);
-  const tiposTexto =
-    tipos.length > 0 ? tipos.map(formatearEtiqueta).join(" · ") : "";
+// Modal
+function openModal(recipe) {
+  modalGallery.innerHTML = "";
+  modalSections.innerHTML = "";
+  modalActions.innerHTML = "";
+  modalActions.hidden = true;
 
-  const imgSrc = receta.ruta_imagen || receta.foto || "";
-  const titulo = receta.titulo || "Receta sin título";
+  modalTitle.textContent = recipe.titulo || "Receta";
 
-  const article = document.createElement("article");
-  article.className = "card";
-  article.dataset.index = String(index);
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "card__inner";
-
-  button.innerHTML = `
-    <div class="card__image-wrap">
-      ${
-        imgSrc
-          ? `<img src="${imgSrc}" alt="${titulo}" class="card__image" loading="lazy" />`
-          : `<div class="card__image card__image--placeholder"></div>`
-      }
-    </div>
-    <div class="card__body">
-      <h2 class="card__title">${titulo}</h2>
-      ${
-        tiposTexto
-          ? `<p class="card__meta">${tiposTexto}</p>`
-          : `<p class="card__meta card__meta--muted">Sin categoría</p>`
-      }
-    </div>
-  `;
-
-  button.addEventListener("click", () => abrirModal(receta));
-
-  article.appendChild(button);
-  return article;
-}
-
-// ---- Estado vacío ----
-function mostrarEstadoVacio(titulo, mensaje) {
-  emptyTitle.textContent = titulo;
-  emptyMessage.textContent = mensaje;
-  emptyState.hidden = false;
-}
-
-function ocultarEstadoVacio() {
-  emptyState.hidden = true;
-}
-
-// ---- Modal ----
-function configurarModal() {
-  modalBackdrop.addEventListener("click", cerrarModal);
-  modalClose.addEventListener("click", cerrarModal);
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") cerrarModal();
-  });
-}
-
-function abrirModal(receta) {
-  const tipos = normalizarTipos(receta);
-  const tiposTexto =
-    tipos.length > 0 ? tipos.map(formatearEtiqueta).join(" · ") : "";
-
-  modalTitle.textContent = receta.titulo || "Receta";
-  if (tiposTexto) {
-    modalType.textContent = tiposTexto;
+  const tipos = normaliseTypes(recipe.tipo);
+  if (tipos.length > 0) {
     modalType.hidden = false;
+    modalType.textContent = tipos
+      .map((t) => (t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)))
+      .join(" · ");
   } else {
     modalType.hidden = true;
   }
 
   // Imagen
-  modalGallery.innerHTML = "";
-  const imgSrc = receta.ruta_imagen || receta.foto || "";
-  if (imgSrc) {
+  if (recipe.ruta_imagen) {
     const img = document.createElement("img");
-    img.src = imgSrc;
-    img.alt = receta.titulo || "";
     img.className = "modal__image";
+    img.src = recipe.ruta_imagen;
+    img.alt = recipe.titulo || "Receta";
     modalGallery.appendChild(img);
   }
 
-  // Contenido
-  modalSections.innerHTML = "";
-
-  if (receta.ingredientes && receta.ingredientes.length > 0) {
+  // Ingredientes
+  if (recipe.ingredientes && recipe.ingredientes.length > 0) {
     const section = document.createElement("section");
     section.className = "section";
+
     section.innerHTML = `
       <h3 class="section__title">Ingredientes</h3>
       <ul class="section__list">
-        ${receta.ingredientes.map((i) => `<li>${i}</li>`).join("")}
+        ${recipe.ingredientes.map((i) => `<li>${i}</li>`).join("")}
       </ul>
     `;
     modalSections.appendChild(section);
   }
 
-  if (receta.pasos && receta.pasos.length > 0) {
+  // Pasos
+  if (recipe.pasos && recipe.pasos.length > 0) {
     const section = document.createElement("section");
     section.className = "section";
+
     section.innerHTML = `
       <h3 class="section__title">Pasos</h3>
       <ol class="section__list section__list--numbered">
-        ${receta.pasos.map((p) => `<li>${p}</li>`).join("")}
+        ${recipe.pasos.map((p) => `<li>${p}</li>`).join("")}
       </ol>
     `;
     modalSections.appendChild(section);
   }
 
-  if (receta.consejos && receta.consejos.length > 0) {
+  // Consejos
+  if (recipe.consejos && recipe.consejos.length > 0) {
     const section = document.createElement("section");
     section.className = "section";
+
     section.innerHTML = `
       <h3 class="section__title">Consejos</h3>
       <ul class="section__list">
-        ${receta.consejos.map((c) => `<li>${c}</li>`).join("")}
+        ${recipe.consejos.map((c) => `<li>${c}</li>`).join("")}
       </ul>
     `;
     modalSections.appendChild(section);
   }
 
-  // Botón de link solo si hay URL
-  modalActions.innerHTML = "";
-  const tieneLink = receta.link && String(receta.link).trim() !== "";
-  if (tieneLink) {
-    const btnLink = document.createElement("button");
-    btnLink.type = "button";
-    btnLink.className = "button button--primary";
-    btnLink.textContent = "Abrir enlace";
-    btnLink.addEventListener("click", () => {
-      window.open(receta.link, "_blank");
-    });
-    modalActions.appendChild(btnLink);
+  // Botón de link si existe
+  if (recipe.link && recipe.link.trim() !== "") {
     modalActions.hidden = false;
-  } else {
-    modalActions.hidden = true;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "button button--primary";
+    btn.textContent = "Abrir enlace";
+    btn.addEventListener("click", () => {
+      window.open(recipe.link, "_blank", "noopener,noreferrer");
+    });
+    modalActions.appendChild(btn);
   }
 
   modal.classList.remove("hidden");
   modal.setAttribute("aria-hidden", "false");
 }
 
-function cerrarModal() {
+function closeModal() {
   modal.classList.add("hidden");
   modal.setAttribute("aria-hidden", "true");
 }
+
+// Eventos
+searchInput.addEventListener("input", (e) => {
+  searchTerm = e.target.value || "";
+  applyFilters();
+});
+
+filtersToggle.addEventListener("click", () => {
+  const isHidden = filtersPanel.hasAttribute("hidden");
+  if (isHidden) {
+    filtersPanel.removeAttribute("hidden");
+  } else {
+    filtersPanel.setAttribute("hidden", "");
+  }
+});
+
+// Delegación de eventos para filtros
+filtersContainer.addEventListener("click", (event) => {
+  const btn = event.target.closest(".filter-button");
+  if (!btn) return;
+
+  const type = btn.dataset.filterType;
+  if (!type) return;
+
+  if (activeTypes.has(type)) {
+    activeTypes.delete(type);
+    btn.classList.remove("is-active");
+  } else {
+    activeTypes.add(type);
+    btn.classList.add("is-active");
+  }
+
+  applyFilters();
+});
+
+// Cerrar modal
+modal.addEventListener("click", (event) => {
+  if (event.target.dataset.dismiss === "modal" || event.target.closest("[data-dismiss='modal']")) {
+    closeModal();
+  }
+});
+
+// Escape
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+    closeModal();
+  }
+});
+
+// Arranque
+loadRecipes().catch((err) => {
+  console.error("Error cargando recetas:", err);
+});
