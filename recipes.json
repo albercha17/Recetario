@@ -30,7 +30,7 @@
   },
   {
     "titulo": "Fabada asturiana",
-    "tipo": "principal",
+    "tipo": ["principal", "guiso"],
     "ingredientes": [
       "100gr de fabes por persona",
       "chorizo",
@@ -51,7 +51,7 @@
   },
   {
     "titulo": "Arroz a la cubana",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [
       "Arroz",
       "2 dientes de ajo",
@@ -76,7 +76,7 @@
   },
   {
     "titulo": "Arroz blanco",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [
       "2 dientes de ajo",
       "Un vaso de arroz blanco",
@@ -94,7 +94,7 @@
   },
   {
     "titulo": "Arroz con calamares",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [
       "½ cebolla y pimiento",
       "Calamares",
@@ -120,7 +120,7 @@
   },
   {
     "titulo": "Arroz con costillas",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
@@ -129,7 +129,7 @@
   },
   {
     "titulo": "Arroz con pollo",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [
       "Tiempo de cocción: 9 minutos",
       "Contramuslos de pollo deshuesados sin piel",
@@ -493,7 +493,7 @@
   },
   {
     "titulo": "Noodles de arroz con pollo y verduras",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [
       "Noodles de arroz",
       "Verduras al gusto (pimiento, cebolla y setas)",
@@ -514,7 +514,7 @@
   },
   {
     "titulo": "Ñoquis con salsa de queso azul",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [
       "Ñoquis",
       "Queso azul",
@@ -535,7 +535,7 @@
   },
   {
     "titulo": "Paella del Luisma",
-    "tipo": "principal",
+    "tipo": ["principal", "arroz"],
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
@@ -581,7 +581,7 @@
   },
   {
     "titulo": "Pasta al forno",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
@@ -590,7 +590,7 @@
   },
   {
     "titulo": "Pasta con gulas",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
@@ -600,7 +600,7 @@
   },
   {
     "titulo": "Pasta Frutti Di Mare",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [],
     "pasos": [],
     "consejos": [],
