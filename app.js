@@ -386,3 +386,16 @@ document.addEventListener("keydown", (event) => {
 loadRecipes().catch((err) => {
   console.error("Error cargando recetas:", err);
 });
+// Evitar zoom con doble-tap en iOS
+let lastTouchTime = 0;
+document.addEventListener(
+  "touchend",
+  (e) => {
+    const now = window.performance.now();
+    if (now - lastTouchTime <= 300) {
+      e.preventDefault();
+    }
+    lastTouchTime = now;
+  },
+  false
+);
