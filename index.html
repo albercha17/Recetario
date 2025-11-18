@@ -6,7 +6,91 @@
     <title>Recetario C & A</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
+  </head><!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recetario C & A</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
   </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header app-header--compact">
+        <div class="header__brand">
+          <span class="logo-wrap">
+            <img src="imagenes/logo.png" alt="" class="logo-mark" />
+          </span>
+          <div class="header__brand-text">
+            <span class="logo">Recetario</span>
+            <p class="tagline">Las mejores recetas de Cristina & Alberto</p>
+          </div>
+        </div>
+
+        <div class="header__controls header__controls--compact">
+          <label class="search search--sm" for="search">
+            <span class="sr-only">Buscar receta por nombre</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="search__icon">
+              <path
+                d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 4.99L20.49 19zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"
+                fill="currentColor"
+              ></path>
+            </svg>
+            <input
+              id="search"
+              type="search"
+              name="search"
+              placeholder="Buscar receta por nombre"
+              autocomplete="off"
+            />
+          </label>
+
+          <!-- Los filtros los genera app.js -->
+          <div
+            id="filter-group"
+            class="filter-group filter-group--compact"
+            role="group"
+            aria-label="Filtrar por tipo de plato"
+          ></div>
+        </div>
+      </header>
+
+      <main class="content" aria-live="polite">
+        <section id="empty-state" class="empty-state" hidden>
+          <div class="empty-state__icon" aria-hidden="true">🍽️</div>
+          <h2 id="empty-state-title"></h2>
+          <p id="empty-state-message"></p>
+        </section>
+        <section id="cards" class="card-grid" aria-label="Listado de recetas"></section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal hidden" aria-hidden="true">
+      <div class="modal__backdrop" data-dismiss="modal"></div>
+      <article class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button type="button" class="modal__close" aria-label="Cerrar detalles" data-dismiss="modal">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7a1 1 0 1 0-1.41 1.42L10.59 12l-4.89 4.88a1 1 0 1 0 1.41 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.41L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </button>
+        <div class="modal__body">
+          <div id="modal-gallery" class="modal__gallery" aria-label="Imágenes de la receta"></div>
+          <div class="modal__content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-type" class="modal__type" hidden></p>
+            <div id="modal-sections" class="sections"></div>
+            <div id="modal-actions" class="modal__actions" hidden></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </body>
+</html>
+
   <body>
     <div class="app-shell">
       <header class="app-header app-header--compact">

@@ -1,6 +1,6 @@
 // app.js
 
-// ---------- Utilidades ----------
+// ---- Utilidades de tipos ----
 function normalizarTipos(recipe) {
   const t = recipe.tipo;
   if (Array.isArray(t)) {
@@ -18,17 +18,16 @@ function formatearEtiqueta(tipo) {
   const lower = tipo.toLowerCase();
   if (lower === "principal") return "Principal";
   if (lower === "postre") return "Postre";
-  // el resto, capitalizado normal
   return tipo.charAt(0).toUpperCase() + tipo.slice(1);
 }
 
-// ---------- Estado ----------
+// ---- Estado global ----
 let todasLasRecetas = [];
 let recetasFiltradas = [];
-let filtroActivo = null; // null = todas
+let filtroActivo = null; // null = sin filtro → todas
 let terminoBusqueda = "";
 
-// ---------- Referencias DOM ----------
+// ---- DOM ----
 const cardsContainer = document.getElementById("cards");
 const emptyState = document.getElementById("empty-state");
 const emptyTitle = document.getElementById("empty-state-title");
@@ -45,9 +44,9 @@ const modalSections = document.getElementById("modal-sections");
 const modalGallery = document.getElementById("modal-gallery");
 const modalActions = document.getElementById("modal-actions");
 
-// ---------- Carga inicial ----------
+// ---- Inicio ----
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("recipes.json") // ajusta la ruta si tu JSON se llama distinto
+  fetch("recipes.json") // cambia el nombre si tu archivo se llama distinto
     .then((res) => {
       if (!res.ok) throw new Error("No se pudo cargar recipes.json");
       return res.json();
@@ -71,38 +70,62 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarModal();
 });
 
-// ---------- Filtros dinámicos ----------
+// ---- Filtros dinámicos (con primera fila fija) ----
 function inicializarFiltros(recetas) {
   const conteoTipos = new Map();
 
   recetas.forEach((receta) => {
     const tipos = normalizarTipos(receta);
     tipos.forEach((tipo) => {
-      conteoTipos.set(tipo, (conteoTipos.get(tipo) || 0) + 1);
+      const key = tipo;
+      conteoTipos.set(key, (conteoTipos.get(key) || 0) + 1);
     });
   });
 
-  // Limpiar contenedor
+  const tiposDisponibles = Array.from(conteoTipos.keys());
+
   filterGroup.innerHTML = "";
 
-  // Botón "Todas"
-  const btnTodas = document.createElement("button");
-  btnTodas.type = "button";
-  btnTodas.className = "filter-button filter-button--sm is-active";
-  btnTodas.dataset.filterType = "";
-  btnTodas.setAttribute("aria-pressed", "true");
-  btnTodas.innerHTML = `
-    <span class="filter-button__label">Todas</span>
-    <span class="filter-button__count" data-filter-count>${todasLasRecetas.length}</span>
-  `;
-  filterGroup.appendChild(btnTodas);
+  const prioridad = ["principal", "postre"];
 
-  // Resto de botones basados en los tipos del JSON
-  const tiposOrdenados = Array.from(conteoTipos.entries()).sort(([a], [b]) =>
-    a.localeCompare(b, "es", { sensitivity: "base" })
-  );
+  // 1) Filtros de prioridad (primera fila)
+  prioridad.forEach((clave) => {
+    const tipoReal = tiposDisponibles.find(
+      (t) => t.toLowerCase() === clave.toLowerCase()
+    );
+    if (!tipoReal) return;
 
-  tiposOrdenados.forEach(([tipo, count]) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "filter-button filter-button--sm";
+    btn.dataset.filterType = tipoReal;
+    btn.setAttribute("aria-pressed", "false");
+    btn.innerHTML = `
+      <span class="filter-button__label">${formatearEtiqueta(tipoReal)}</span>
+      <span class="filter-button__count" data-filter-count>${
+        conteoTipos.get(tipoReal) || 0
+      }</span>
+    `;
+    filterGroup.appendChild(btn);
+  });
+
+  // 2) Hueco fantasma para que la primera fila tenga SOLO esos dos
+  const spacer = document.createElement("div");
+  spacer.className = "filter-spacer";
+  spacer.setAttribute("aria-hidden", "true");
+  filterGroup.appendChild(spacer);
+
+  // 3) Resto de tipos, ordenados alfabéticamente
+  const resto = tiposDisponibles
+    .filter(
+      (t) =>
+        !prioridad.some((p) => p.toLowerCase() === t.toLowerCase())
+    )
+    .sort((a, b) =>
+      a.localeCompare(b, "es", { sensitivity: "base" })
+    );
+
+  resto.forEach((tipo) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "filter-button filter-button--sm";
@@ -110,31 +133,45 @@ function inicializarFiltros(recetas) {
     btn.setAttribute("aria-pressed", "false");
     btn.innerHTML = `
       <span class="filter-button__label">${formatearEtiqueta(tipo)}</span>
-      <span class="filter-button__count" data-filter-count>${count}</span>
+      <span class="filter-button__count" data-filter-count>${
+        conteoTipos.get(tipo) || 0
+      }</span>
     `;
     filterGroup.appendChild(btn);
   });
 
-  // Delegación de eventos para todos los botones de filtro
+  // 4) Evento de click (un solo filtro activo; click otra vez = limpiar filtro)
   filterGroup.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-filter-type]");
     if (!button) return;
 
     const type = button.dataset.filterType;
-    filtroActivo = type && type.length > 0 ? type : null;
 
-    // Actualizar estado visual de los botones
-    filterGroup.querySelectorAll("button[data-filter-type]").forEach((btn) => {
-      const isActive = btn === button;
-      btn.classList.toggle("is-active", isActive);
-      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-    });
+    // Si clicas el mismo filtro que estaba activo → se desactiva (ver todas)
+    if (filtroActivo === type) {
+      filtroActivo = null;
+      filterGroup
+        .querySelectorAll("button[data-filter-type]")
+        .forEach((btn) => {
+          btn.classList.remove("is-active");
+          btn.setAttribute("aria-pressed", "false");
+        });
+    } else {
+      filtroActivo = type;
+      filterGroup
+        .querySelectorAll("button[data-filter-type]")
+        .forEach((btn) => {
+          const isActive = btn === button;
+          btn.classList.toggle("is-active", isActive);
+          btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+    }
 
     aplicarFiltros();
   });
 }
 
-// ---------- Buscador ----------
+// ---- Buscador ----
 function configurarBuscador() {
   searchInput.addEventListener("input", () => {
     terminoBusqueda = searchInput.value.trim().toLowerCase();
@@ -142,7 +179,7 @@ function configurarBuscador() {
   });
 }
 
-// ---------- Aplicar filtros ----------
+// ---- Aplicar filtros ----
 function aplicarFiltros() {
   recetasFiltradas = todasLasRecetas.filter((receta) => {
     const titulo = (receta.titulo || "").toLowerCase();
@@ -158,7 +195,7 @@ function aplicarFiltros() {
   renderizarRecetas(recetasFiltradas);
 }
 
-// ---------- Renderizado de tarjetas ----------
+// ---- Render tarjetas ----
 function renderizarRecetas(recetas) {
   cardsContainer.innerHTML = "";
 
@@ -172,14 +209,11 @@ function renderizarRecetas(recetas) {
 
   ocultarEstadoVacio();
 
-  const fragment = document.createDocumentFragment();
-
+  const frag = document.createDocumentFragment();
   recetas.forEach((receta, index) => {
-    const card = crearTarjeta(receta, index);
-    fragment.appendChild(card);
+    frag.appendChild(crearTarjeta(receta, index));
   });
-
-  cardsContainer.appendChild(fragment);
+  cardsContainer.appendChild(frag);
 }
 
 function crearTarjeta(receta, index) {
@@ -216,15 +250,13 @@ function crearTarjeta(receta, index) {
     </div>
   `;
 
-  button.addEventListener("click", () => {
-    abrirModal(receta);
-  });
+  button.addEventListener("click", () => abrirModal(receta));
 
   article.appendChild(button);
   return article;
 }
 
-// ---------- Estado vacío ----------
+// ---- Estado vacío ----
 function mostrarEstadoVacio(titulo, mensaje) {
   emptyTitle.textContent = titulo;
   emptyMessage.textContent = mensaje;
@@ -235,7 +267,7 @@ function ocultarEstadoVacio() {
   emptyState.hidden = true;
 }
 
-// ---------- Modal ----------
+// ---- Modal ----
 function configurarModal() {
   modalBackdrop.addEventListener("click", cerrarModal);
   modalClose.addEventListener("click", cerrarModal);
@@ -268,7 +300,7 @@ function abrirModal(receta) {
     modalGallery.appendChild(img);
   }
 
-  // Secciones texto
+  // Contenido
   modalSections.innerHTML = "";
 
   if (receta.ingredientes && receta.ingredientes.length > 0) {
@@ -307,14 +339,14 @@ function abrirModal(receta) {
     modalSections.appendChild(section);
   }
 
-  // Botón de link (solo dentro del modal)
+  // Botón de link solo si hay URL
   modalActions.innerHTML = "";
   const tieneLink = receta.link && String(receta.link).trim() !== "";
   if (tieneLink) {
     const btnLink = document.createElement("button");
     btnLink.type = "button";
     btnLink.className = "button button--primary";
-    btnLink.textContent = "Ver receta / vídeo";
+    btnLink.textContent = "Abrir enlace";
     btnLink.addEventListener("click", () => {
       window.open(receta.link, "_blank");
     });
