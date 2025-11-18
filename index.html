@@ -36,26 +36,13 @@
             />
           </label>
 
-          <div class="filter-group filter-group--compact" role="group" aria-label="Filtrar por tipo de plato">
-            <button
-              type="button"
-              class="filter-button filter-button--sm"
-              data-filter-type="principal"
-              aria-pressed="false"
-            >
-              <span class="filter-button__label">Platos principales</span>
-              <span class="filter-button__count" data-filter-count>0</span>
-            </button>
-            <button
-              type="button"
-              class="filter-button filter-button--sm"
-              data-filter-type="postre"
-              aria-pressed="false"
-            >
-              <span class="filter-button__label">Postres</span>
-              <span class="filter-button__count" data-filter-count>0</span>
-            </button>
-          </div>
+          <!-- AHORA LOS FILTROS SE GENERAN DINÁMICAMENTE DESDE app.js -->
+          <div
+            id="filter-group"
+            class="filter-group filter-group--compact"
+            role="group"
+            aria-label="Filtrar por tipo de plato"
+          ></div>
         </div>
       </header>
 

@@ -1,327 +1,334 @@
-(() => {
-  const cardsContainer = document.getElementById('cards');
-  const emptyState = document.getElementById('empty-state');
-  const emptyTitle = document.getElementById('empty-state-title');
-  const emptyMessage = document.getElementById('empty-state-message');
-  const searchInput = document.getElementById('search');
-  const modal = document.getElementById('modal');
-  const modalGallery = document.getElementById('modal-gallery');
-  const modalTitle = document.getElementById('modal-title');
-  const modalSections = document.getElementById('modal-sections');
-  const modalType = document.getElementById('modal-type');
-  const modalActions = document.getElementById('modal-actions');
-  const dismissButtons = modal.querySelectorAll('[data-dismiss="modal"]');
-  const filterButtons = Array.from(document.querySelectorAll('[data-filter-type]'));
-  const header = document.querySelector('.app-header');
+// app.js
 
-  const state = { recipes: [], filtered: [], activeTypes: new Set() };
-  let lastFocusedElement = null;
+// ---------- Utilidades ----------
+function normalizarTipos(recipe) {
+  const t = recipe.tipo;
+  if (Array.isArray(t)) {
+    return t
+      .map((x) => String(x).trim())
+      .filter((x) => x.length > 0);
+  }
+  if (typeof t === "string" && t.trim() !== "") {
+    return [t.trim()];
+  }
+  return [];
+}
 
-  document.addEventListener('DOMContentLoaded', init);
+function formatearEtiqueta(tipo) {
+  const lower = tipo.toLowerCase();
+  if (lower === "principal") return "Principal";
+  if (lower === "postre") return "Postre";
+  // el resto, capitalizado normal
+  return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+}
 
-  async function init() {
-    // --- medir header y actualizar padding ---
-    const updateHeaderSpace = () => {
-      if (!header) return;
-      const h = Math.ceil(header.getBoundingClientRect().height);
-      document.documentElement.style.setProperty('--header-h', h + 'px');
-    };
-    updateHeaderSpace();
-    window.addEventListener('resize', updateHeaderSpace);
-    // iOS: cuando aparece/desaparece teclado
-    window.addEventListener('orientationchange', () => setTimeout(updateHeaderSpace, 250));
-    // al enfocar el buscador puede cambiar la altura
-    searchInput?.addEventListener('focus', () => setTimeout(updateHeaderSpace, 150));
-    searchInput?.addEventListener('blur', () => setTimeout(updateHeaderSpace, 150));
+// ---------- Estado ----------
+let todasLasRecetas = [];
+let recetasFiltradas = [];
+let filtroActivo = null; // null = todas
+let terminoBusqueda = "";
 
-    try {
-      const recipes = await loadRecipes();
-      state.recipes = recipes;
-      applyFilters();
-    } catch (error) {
-      console.error('No se pudieron cargar las recetas', error);
-      state.recipes = [];
-      state.filtered = [];
-      renderCards([]);
-      setEmptyState({
-        visible: true,
-        title: 'No se pudieron cargar las recetas',
-        message: 'Revisa que recipes.json esté en la raíz y tenga el formato correcto.',
-      });
-      updateFilterCounts([]);
-    }
+// ---------- Referencias DOM ----------
+const cardsContainer = document.getElementById("cards");
+const emptyState = document.getElementById("empty-state");
+const emptyTitle = document.getElementById("empty-state-title");
+const emptyMessage = document.getElementById("empty-state-message");
+const searchInput = document.getElementById("search");
+const filterGroup = document.getElementById("filter-group");
 
-    searchInput?.addEventListener('input', handleSearch);
-    filterButtons.forEach((button) => {
-      button.addEventListener('click', () => toggleTypeFilter(button.dataset.filterType));
+const modal = document.getElementById("modal");
+const modalBackdrop = modal.querySelector(".modal__backdrop");
+const modalClose = modal.querySelector(".modal__close");
+const modalTitle = document.getElementById("modal-title");
+const modalType = document.getElementById("modal-type");
+const modalSections = document.getElementById("modal-sections");
+const modalGallery = document.getElementById("modal-gallery");
+const modalActions = document.getElementById("modal-actions");
+
+// ---------- Carga inicial ----------
+document.addEventListener("DOMContentLoaded", () => {
+  fetch("recipes.json") // ajusta la ruta si tu JSON se llama distinto
+    .then((res) => {
+      if (!res.ok) throw new Error("No se pudo cargar recipes.json");
+      return res.json();
+    })
+    .then((data) => {
+      todasLasRecetas = Array.isArray(data) ? data : [];
+      recetasFiltradas = [...todasLasRecetas];
+
+      inicializarFiltros(todasLasRecetas);
+      configurarBuscador();
+      renderizarRecetas(recetasFiltradas);
+    })
+    .catch((err) => {
+      console.error(err);
+      mostrarEstadoVacio(
+        "No se han podido cargar las recetas",
+        "Comprueba que el archivo recipes.json está en la ruta correcta."
+      );
     });
 
-    dismissButtons.forEach((button) => button.addEventListener('click', closeModal));
-    modal.addEventListener('click', (e) => {
-      if (e.target instanceof HTMLElement && e.target.dataset.dismiss === 'modal') closeModal();
+  configurarModal();
+});
+
+// ---------- Filtros dinámicos ----------
+function inicializarFiltros(recetas) {
+  const conteoTipos = new Map();
+
+  recetas.forEach((receta) => {
+    const tipos = normalizarTipos(receta);
+    tipos.forEach((tipo) => {
+      conteoTipos.set(tipo, (conteoTipos.get(tipo) || 0) + 1);
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
-    });
-  }
+  });
 
-  async function loadRecipes() {
-    const response = await fetch('recipes.json', { cache: 'no-store' });
-    if (!response.ok) throw new Error(`No se pudo obtener recipes.json: ${response.status}`);
-    const payload = await response.json();
-    const entries = Array.isArray(payload) ? payload : Array.isArray(payload.recipes) ? payload.recipes : [];
-    const normalized = entries.map(normalizeRecipe);
-    return normalized.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
-  }
+  // Limpiar contenedor
+  filterGroup.innerHTML = "";
 
-  function normalizeRecipe(entry) {
-    const rawTitle = typeof entry.titulo === 'string' ? entry.titulo.trim() : '';
-    const type = typeof entry.tipo === 'string' ? entry.tipo.trim() : '';
-    const typeKey = getTypeKey(type);
-    const typeLabel = formatRecipeType(type);
+  // Botón "Todas"
+  const btnTodas = document.createElement("button");
+  btnTodas.type = "button";
+  btnTodas.className = "filter-button filter-button--sm is-active";
+  btnTodas.dataset.filterType = "";
+  btnTodas.setAttribute("aria-pressed", "true");
+  btnTodas.innerHTML = `
+    <span class="filter-button__label">Todas</span>
+    <span class="filter-button__count" data-filter-count>${todasLasRecetas.length}</span>
+  `;
+  filterGroup.appendChild(btnTodas);
 
-    const ingredients = Array.isArray(entry.ingredientes) ? entry.ingredientes.map((s)=>String(s).trim()).filter(Boolean) : [];
-    const steps = Array.isArray(entry.pasos) ? entry.pasos.map((s)=>String(s).trim()).filter(Boolean) : [];
-    let tips = [];
-    if (Array.isArray(entry.consejos)) tips = entry.consejos.map((s)=>String(s).trim()).filter(Boolean);
-    else if (typeof entry.consejos === 'string' && entry.consejos.trim()) tips = [entry.consejos.trim()];
+  // Resto de botones basados en los tipos del JSON
+  const tiposOrdenados = Array.from(conteoTipos.entries()).sort(([a], [b]) =>
+    a.localeCompare(b, "es", { sensitivity: "base" })
+  );
 
-    const imagePath = typeof entry.ruta_imagen === 'string' ? entry.ruta_imagen.trim() : '';
-    const imageName = typeof entry.foto === 'string' ? entry.foto.trim() : '';
-    const image = imagePath || (imageName ? (imageName.includes('/') ? imageName : `images/${imageName}`) : '');
-    const link = typeof entry.link === 'string' ? entry.link.trim() : '';
+  tiposOrdenados.forEach(([tipo, count]) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "filter-button filter-button--sm";
+    btn.dataset.filterType = tipo;
+    btn.setAttribute("aria-pressed", "false");
+    btn.innerHTML = `
+      <span class="filter-button__label">${formatearEtiqueta(tipo)}</span>
+      <span class="filter-button__count" data-filter-count>${count}</span>
+    `;
+    filterGroup.appendChild(btn);
+  });
 
-    const searchParts = [rawTitle, type, typeLabel, ...ingredients, ...steps, ...tips]
-      .map(normalizeText).filter(Boolean);
+  // Delegación de eventos para todos los botones de filtro
+  filterGroup.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-filter-type]");
+    if (!button) return;
 
-    return {
-      title: rawTitle || 'Receta sin título',
-      type, typeKey, typeLabel,
-      ingredients, steps, tips,
-      image, link,
-      searchText: searchParts.join(' ')
-    };
-  }
+    const type = button.dataset.filterType;
+    filtroActivo = type && type.length > 0 ? type : null;
 
-  const normalizeText = (v) => String(v || '')
-    .toLocaleLowerCase('es')
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '');
-
-  const getTypeKey = (v) => normalizeText(v).replace(/\s+/g, '');
-
-  function formatRecipeType(value) {
-    const key = getTypeKey(value);
-    if (!key) return '';
-    if (key === 'principal') return 'Plato principal';
-    if (key === 'postre') return 'Postre';
-    return value.charAt(0).toLocaleUpperCase('es') + value.slice(1);
-  }
-
-  function handleSearch() { applyFilters(); }
-
-  function toggleTypeFilter(type) {
-    const key = getTypeKey(type || '');
-    if (!key) return;
-    if (state.activeTypes.has(key)) state.activeTypes.delete(key);
-    else state.activeTypes.add(key);
-    updateFilterButtons();
-    applyFilters();
-  }
-
-  function updateFilterButtons() {
-    filterButtons.forEach((button) => {
-      const key = getTypeKey(button.dataset.filterType || '');
-      const isActive = key ? state.activeTypes.has(key) : false;
-      button.classList.toggle('is-active', isActive);
-      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-  }
-
-  function updateFilterCounts(recipes) {
-    const counts = {};
-    filterButtons.forEach((b) => { const k = getTypeKey(b.dataset.filterType || ''); if (k) counts[k] = 0; });
-    (recipes || []).forEach((r) => { if (r.typeKey && counts.hasOwnProperty(r.typeKey)) counts[r.typeKey] += 1; });
-    filterButtons.forEach((b) => {
-      const countEl = b.querySelector('[data-filter-count]');
-      const k = getTypeKey(b.dataset.filterType || '');
-      if (!countEl || !k) return;
-      countEl.textContent = String(counts[k] ?? 0);
-    });
-  }
-
-  function applyFilters() {
-    if (!state.recipes.length) {
-      state.filtered = [];
-      renderCards([]);
-      setEmptyState({ visible: true, title: 'No hay recetas', message: 'Añade tus recetas a recipes.json.' });
-      updateFilterCounts([]);
-      return;
-    }
-
-    const query = searchInput?.value.trim() || '';
-    const normalizedQuery = normalizeText(query);
-    let filtered = state.recipes;
-
-    if (normalizedQuery) filtered = filtered.filter((r) => r.searchText.includes(normalizedQuery));
-    updateFilterCounts(filtered);
-    if (state.activeTypes.size) filtered = filtered.filter((r) => state.activeTypes.has(r.typeKey));
-
-    state.filtered = filtered;
-    renderCards(filtered);
-    if (!filtered.length) setEmptyState({ visible: true, title: 'Sin resultados', message: `No hay coincidencias con “${query}”.` });
-    else setEmptyState({ visible: false });
-  }
-
-  function setEmptyState({ visible, title = '', message = '' }) {
-    if (visible) {
-      emptyTitle.textContent = title;
-      emptyMessage.textContent = message;
-      emptyState.hidden = false;
-    } else {
-      emptyTitle.textContent = '';
-      emptyMessage.textContent = '';
-      emptyState.hidden = true;
-    }
-  }
-
-  function renderCards(recipes) {
-    cardsContainer.innerHTML = '';
-    if (!recipes.length) return;
-    const fragment = document.createDocumentFragment();
-    recipes.forEach((recipe) => fragment.appendChild(createRecipeCard(recipe)));
-    cardsContainer.appendChild(fragment);
-  }
-
-  function createRecipeCard(recipe) {
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'recipe-card';
-    card.dataset.hasImage = recipe.image ? 'true' : 'false';
-    if (recipe.typeKey) card.setAttribute('data-type', recipe.typeKey);
-    card.setAttribute('aria-label', `Ver detalles de ${recipe.title}`);
-
-    const image = document.createElement('div');
-    image.className = 'recipe-card__image';
-
-    if (recipe.typeLabel) {
-      const badge = document.createElement('span');
-      badge.className = 'recipe-card__badge';
-      badge.textContent = recipe.typeLabel;
-      image.appendChild(badge);
-    }
-
-    if (recipe.image) {
-      image.style.setProperty('--image-url', `url("${recipe.image}")`);
-    } else {
-      const placeholder = document.createElement('div');
-      placeholder.className = 'recipe-card__placeholder';
-      placeholder.textContent = recipe.title.charAt(0).toUpperCase();
-      image.appendChild(placeholder);
-    }
-
-    const title = document.createElement('span');
-    title.className = 'recipe-card__title';
-    title.textContent = recipe.title;
-    image.appendChild(title);
-
-    // ❌ SIN botón de link en la tarjeta
-    card.appendChild(image);
-
-    card.addEventListener('click', () => openRecipe(recipe));
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRecipe(recipe); }
+    // Actualizar estado visual de los botones
+    filterGroup.querySelectorAll("button[data-filter-type]").forEach((btn) => {
+      const isActive = btn === button;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
 
-    return card;
+    aplicarFiltros();
+  });
+}
+
+// ---------- Buscador ----------
+function configurarBuscador() {
+  searchInput.addEventListener("input", () => {
+    terminoBusqueda = searchInput.value.trim().toLowerCase();
+    aplicarFiltros();
+  });
+}
+
+// ---------- Aplicar filtros ----------
+function aplicarFiltros() {
+  recetasFiltradas = todasLasRecetas.filter((receta) => {
+    const titulo = (receta.titulo || "").toLowerCase();
+    const coincideBusqueda =
+      terminoBusqueda === "" || titulo.includes(terminoBusqueda);
+
+    const tipos = normalizarTipos(receta);
+    const coincideTipo = !filtroActivo || tipos.includes(filtroActivo);
+
+    return coincideBusqueda && coincideTipo;
+  });
+
+  renderizarRecetas(recetasFiltradas);
+}
+
+// ---------- Renderizado de tarjetas ----------
+function renderizarRecetas(recetas) {
+  cardsContainer.innerHTML = "";
+
+  if (!recetas || recetas.length === 0) {
+    mostrarEstadoVacio(
+      "No hay resultados",
+      "Prueba a quitar algún filtro o a buscar otro nombre."
+    );
+    return;
   }
 
-  function openRecipe(recipe) {
-    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    populateModal(recipe);
-    modal.classList.add('active');
-    modal.classList.remove('hidden');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('no-scroll');
-    modal.querySelector('.modal__close')?.focus();
+  ocultarEstadoVacio();
+
+  const fragment = document.createDocumentFragment();
+
+  recetas.forEach((receta, index) => {
+    const card = crearTarjeta(receta, index);
+    fragment.appendChild(card);
+  });
+
+  cardsContainer.appendChild(fragment);
+}
+
+function crearTarjeta(receta, index) {
+  const tipos = normalizarTipos(receta);
+  const tiposTexto =
+    tipos.length > 0 ? tipos.map(formatearEtiqueta).join(" · ") : "";
+
+  const imgSrc = receta.ruta_imagen || receta.foto || "";
+  const titulo = receta.titulo || "Receta sin título";
+
+  const article = document.createElement("article");
+  article.className = "card";
+  article.dataset.index = String(index);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "card__inner";
+
+  button.innerHTML = `
+    <div class="card__image-wrap">
+      ${
+        imgSrc
+          ? `<img src="${imgSrc}" alt="${titulo}" class="card__image" loading="lazy" />`
+          : `<div class="card__image card__image--placeholder"></div>`
+      }
+    </div>
+    <div class="card__body">
+      <h2 class="card__title">${titulo}</h2>
+      ${
+        tiposTexto
+          ? `<p class="card__meta">${tiposTexto}</p>`
+          : `<p class="card__meta card__meta--muted">Sin categoría</p>`
+      }
+    </div>
+  `;
+
+  button.addEventListener("click", () => {
+    abrirModal(receta);
+  });
+
+  article.appendChild(button);
+  return article;
+}
+
+// ---------- Estado vacío ----------
+function mostrarEstadoVacio(titulo, mensaje) {
+  emptyTitle.textContent = titulo;
+  emptyMessage.textContent = mensaje;
+  emptyState.hidden = false;
+}
+
+function ocultarEstadoVacio() {
+  emptyState.hidden = true;
+}
+
+// ---------- Modal ----------
+function configurarModal() {
+  modalBackdrop.addEventListener("click", cerrarModal);
+  modalClose.addEventListener("click", cerrarModal);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") cerrarModal();
+  });
+}
+
+function abrirModal(receta) {
+  const tipos = normalizarTipos(receta);
+  const tiposTexto =
+    tipos.length > 0 ? tipos.map(formatearEtiqueta).join(" · ") : "";
+
+  modalTitle.textContent = receta.titulo || "Receta";
+  if (tiposTexto) {
+    modalType.textContent = tiposTexto;
+    modalType.hidden = false;
+  } else {
+    modalType.hidden = true;
   }
 
-  function closeModal() {
-    modal.classList.remove('active');
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('no-scroll');
-    if (lastFocusedElement) lastFocusedElement.focus();
+  // Imagen
+  modalGallery.innerHTML = "";
+  const imgSrc = receta.ruta_imagen || receta.foto || "";
+  if (imgSrc) {
+    const img = document.createElement("img");
+    img.src = imgSrc;
+    img.alt = receta.titulo || "";
+    img.className = "modal__image";
+    modalGallery.appendChild(img);
   }
 
-  function populateModal(recipe) {
-    modalTitle.textContent = recipe.title;
-    if (recipe.typeLabel) { modalType.textContent = recipe.typeLabel; modalType.hidden = false; }
-    else { modalType.textContent = ''; modalType.hidden = true; }
+  // Secciones texto
+  modalSections.innerHTML = "";
 
-    modalGallery.innerHTML = '';
-    if (recipe.image) {
-      const img = document.createElement('img');
-      img.src = recipe.image; img.loading = 'lazy';
-      img.alt = `Fotografía de ${recipe.title}`;
-      modalGallery.appendChild(img);
-    } else {
-      const ph = document.createElement('div');
-      ph.className = 'modal__placeholder';
-      ph.textContent = 'Esta receta no tiene fotografía.';
-      modalGallery.appendChild(ph);
-    }
-
-    modalSections.innerHTML = '';
-    const sections = [];
-    if (recipe.ingredients.length) sections.push(createListSection('Ingredientes', recipe.ingredients));
-    if (recipe.steps.length) sections.push(createListSection('Pasos', recipe.steps));
-    if (recipe.tips.length) sections.push(createParagraphSection('Consejos', recipe.tips));
-    if (sections.length) sections.forEach((s) => modalSections.appendChild(s));
-    else {
-      const p = document.createElement('p');
-      p.className = 'modal__empty';
-      p.textContent = 'No hay información disponible para esta receta.';
-      modalSections.appendChild(p);
-    }
-
-    // ✅ Solo botón de link en el modal
-    modalActions.innerHTML = '';
-    if (recipe.link) {
-      const linkBtn = document.createElement('a');
-      linkBtn.href = recipe.link;
-      linkBtn.target = '_blank';
-      linkBtn.rel = 'noopener noreferrer';
-      linkBtn.className = 'button button--primary';
-      linkBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" fill="currentColor"></path>
-        </svg>
-        <span>Ver receta online</span>
-      `;
-      modalActions.appendChild(linkBtn);
-      modalActions.hidden = false;
-    } else {
-      modalActions.hidden = true;
-    }
+  if (receta.ingredientes && receta.ingredientes.length > 0) {
+    const section = document.createElement("section");
+    section.className = "section";
+    section.innerHTML = `
+      <h3 class="section__title">Ingredientes</h3>
+      <ul class="section__list">
+        ${receta.ingredientes.map((i) => `<li>${i}</li>`).join("")}
+      </ul>
+    `;
+    modalSections.appendChild(section);
   }
 
-  function createListSection(title, items) {
-    const section = document.createElement('section');
-    section.className = 'recipe-section';
-    const h3 = document.createElement('h3'); h3.textContent = title;
-    section.appendChild(h3);
-    const ul = document.createElement('ul');
-    items.forEach((it) => { const li = document.createElement('li'); li.textContent = it; ul.appendChild(li); });
-    section.appendChild(ul);
-    return section;
+  if (receta.pasos && receta.pasos.length > 0) {
+    const section = document.createElement("section");
+    section.className = "section";
+    section.innerHTML = `
+      <h3 class="section__title">Pasos</h3>
+      <ol class="section__list section__list--numbered">
+        ${receta.pasos.map((p) => `<li>${p}</li>`).join("")}
+      </ol>
+    `;
+    modalSections.appendChild(section);
   }
 
-  function createParagraphSection(title, paragraphs) {
-    const section = document.createElement('section');
-    section.className = 'recipe-section';
-    const h3 = document.createElement('h3'); h3.textContent = title; section.appendChild(h3);
-    paragraphs.forEach((t) => { const p = document.createElement('p'); p.textContent = t; section.appendChild(p); });
-    return section;
+  if (receta.consejos && receta.consejos.length > 0) {
+    const section = document.createElement("section");
+    section.className = "section";
+    section.innerHTML = `
+      <h3 class="section__title">Consejos</h3>
+      <ul class="section__list">
+        ${receta.consejos.map((c) => `<li>${c}</li>`).join("")}
+      </ul>
+    `;
+    modalSections.appendChild(section);
   }
-})();
+
+  // Botón de link (solo dentro del modal)
+  modalActions.innerHTML = "";
+  const tieneLink = receta.link && String(receta.link).trim() !== "";
+  if (tieneLink) {
+    const btnLink = document.createElement("button");
+    btnLink.type = "button";
+    btnLink.className = "button button--primary";
+    btnLink.textContent = "Ver receta / vídeo";
+    btnLink.addEventListener("click", () => {
+      window.open(receta.link, "_blank");
+    });
+    modalActions.appendChild(btnLink);
+    modalActions.hidden = false;
+  } else {
+    modalActions.hidden = true;
+  }
+
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function cerrarModal() {
+  modal.classList.add("hidden");
+  modal.setAttribute("aria-hidden", "true");
+}
