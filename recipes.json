@@ -555,7 +555,7 @@
   },
   {
     "titulo": "Pasta carbonara",
-    "tipo": "principal",
+    "tipo": ["principal", "pasta"],
     "ingredientes": [
       "Pasta que queramos (espaguetis o pasta rellena, mejor)",
       "Pimienta",
