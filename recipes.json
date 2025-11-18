@@ -738,15 +738,28 @@
     "link": ""
   },
   {
-    "titulo": "Potaje de garbanzos con sepia",
-    "tipo": "principal",
-    "ingredientes": [],
-    "pasos": [],
-    "consejos": [],
-    "ruta_imagen": "imagenes/potaje-de-garbanzos-con-sepia.png",
-    "foto": "",
-    "link": ""
-  },
+  "titulo": "Potaje de garbanzos con sepia",
+  "tipo": "principal",
+  "ingredientes": [
+    "1 bote de garbanzos o garbanzos listos para cocinar metiéndolos en agua",
+    "1/2 cebolla",
+    "Una bolsa de sepia descongelada",
+    "Cucharada de pimentón",
+    "Cucharada de harina",
+    "Agua"
+  ],
+  "pasos": [
+    "Pochar. Pochar la cebolla con aceite en la cacerola donde vamos a preparar todo.",
+    "Pimentón y harina. Echar el pimentón y la harina y moverlo durante un minuto para que se tueste y no esté crudo, pero tampoco se queme.",
+    "Agua. Echar un vaso de agua.",
+    "Echar todo. Echamos los garbanzos escurridos y limpiados, junto a la sepia. Cubrimos de agua y echamos sal.",
+    "Cocer. Cocer durante unos 45 minutos hasta que la sepia esté blanda. ¡A comer!"
+  ],
+  "consejos": [],
+  "ruta_imagen": "imagenes/potaje-de-garbanzos-con-sepia.png",
+  "foto": "",
+  "link": ""
+},
   {
     "titulo": "Puré de verduras",
     "tipo": "principal",
