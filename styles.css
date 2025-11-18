@@ -10,6 +10,7 @@
 html,
 body {
   height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -201,7 +202,11 @@ body {
 /* Contenido principal */
 .content {
   margin-top: 0.65rem;
+  overflow-y: auto;      /* ← Añadir */
+  -webkit-overflow-scrolling: touch; /* ← Añadir */
+  height: calc(100vh - 180px); /* ← Ajusta el valor si tu header cambia de tamaño */
 }
+
 
 /* Estado vacío */
 .empty-state {
