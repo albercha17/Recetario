@@ -44,23 +44,62 @@ function hasActiveFilters() {
   return activeTypes.size > 0;
 }
 
-// Carga de datos
+// Carga de datos DESDE GOOGLE APPS SCRIPT
 async function loadRecipes() {
-  const res = await fetch("recipes.json");
-  const data = await res.json();
-  allRecipes = data;
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbwc9sIqJ0Mr2ZJnIZnValJzyO02CGRkRjUpuHycluRW30i81ribTIh7_hrzGXBriHnH/exec",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  // Calcular estadísticas de tipos
-  typeStats = new Map();
-  allRecipes.forEach((recipe) => {
-    const tipos = normaliseTypes(recipe.tipo);
-    tipos.forEach((t) => {
-      typeStats.set(t, (typeStats.get(t) || 0) + 1);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    // Intentamos adivinar dónde viene el array:
+    //  - data.recipes
+    //  - data.data
+    //  - data a secas (si ya es un array)
+    let recipes = Array.isArray(data)
+      ? data
+      : Array.isArray(data.recipes)
+      ? data.recipes
+      : Array.isArray(data.data)
+      ? data.data
+      : null;
+
+    if (!recipes) {
+      console.error("Respuesta de la API inesperada:", data);
+      throw new Error("Formato de datos no válido en la API");
+    }
+
+    allRecipes = recipes;
+
+    // Calcular estadísticas de tipos
+    typeStats = new Map();
+    allRecipes.forEach((recipe) => {
+      const tipos = normaliseTypes(recipe.tipo);
+      tipos.forEach((t) => {
+        typeStats.set(t, (typeStats.get(t) || 0) + 1);
+      });
     });
-  });
 
-  buildFilterButtons();
-  applyFilters();
+    buildFilterButtons();
+    applyFilters();
+  } catch (err) {
+    console.error("Error cargando recetas desde la API:", err);
+    emptyState.hidden = false;
+    emptyTitle.textContent = "Error al cargar recetas";
+    emptyMessage.textContent =
+      "No se han podido cargar los datos desde Google Sheets. Revisa el script o la conexión.";
+  }
 }
 
 // Construir filtros dinámicos
@@ -96,9 +135,12 @@ function buildFilterButtons() {
     btn.className = "filter-button filter-button--sm";
     btn.dataset.filterType = type;
 
-    const label = type === "principal" ? "Principal" :
-                  type === "postre" ? "Postre" :
-                  capitalize(type);
+    const label =
+      type === "principal"
+        ? "Principal"
+        : type === "postre"
+        ? "Postre"
+        : capitalize(type);
 
     const count = typeStats.get(type) || 0;
 
@@ -127,7 +169,7 @@ function recipeMatches(recipe) {
     const haystack = [
       recipe.titulo || "",
       ...(recipe.ingredientes || []),
-      ...(recipe.consejos || [])
+      ...(recipe.consejos || []),
     ]
       .join(" ")
       .toLowerCase();
@@ -156,8 +198,7 @@ function renderCards(recipes) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "card__inner";
-    btn.dataset.index = index; // índice relativo al filtrado? mejor guardar id
-    // Usaremos dataset.id con título único
+    btn.dataset.index = index;
     btn.dataset.title = recipe.titulo;
 
     const imageWrap = document.createElement("div");
@@ -188,7 +229,13 @@ function renderCards(recipes) {
 
     if (tipos.length > 0) {
       const label = tipos
-        .map((t) => (t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)))
+        .map((t) =>
+          t === "principal"
+            ? "Principal"
+            : t === "postre"
+            ? "Postre"
+            : capitalize(t)
+        )
         .join(" · ");
       meta.textContent = label;
     } else {
@@ -217,8 +264,7 @@ function updateEmptyState(count) {
       emptyMessage.textContent =
         "Prueba a quitar filtros o a buscar otro nombre / ingrediente.";
     } else {
-      emptyMessage.textContent =
-        "Añade recetas a tu JSON para verlas aquí.";
+      emptyMessage.textContent = "Añade recetas en tu hoja de Google Sheets.";
     }
   } else {
     emptyState.hidden = true;
@@ -255,7 +301,13 @@ function openModal(recipe) {
   if (tipos.length > 0) {
     modalType.hidden = false;
     modalType.textContent = tipos
-      .map((t) => (t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)))
+      .map((t) =>
+        t === "principal"
+          ? "Principal"
+          : t === "postre"
+          ? "Postre"
+          : capitalize(t)
+      )
       .join(" · ");
   } else {
     modalType.hidden = true;
@@ -370,7 +422,10 @@ filtersContainer.addEventListener("click", (event) => {
 
 // Cerrar modal
 modal.addEventListener("click", (event) => {
-  if (event.target.dataset.dismiss === "modal" || event.target.closest("[data-dismiss='modal']")) {
+  if (
+    event.target.dataset.dismiss === "modal" ||
+    event.target.closest("[data-dismiss='modal']")
+  ) {
     closeModal();
   }
 });
@@ -386,6 +441,7 @@ document.addEventListener("keydown", (event) => {
 loadRecipes().catch((err) => {
   console.error("Error cargando recetas:", err);
 });
+
 // Evitar zoom con doble-tap en iOS
 let lastTouchTime = 0;
 document.addEventListener(
