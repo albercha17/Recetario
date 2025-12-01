@@ -28,7 +28,11 @@ let typeStats = new Map(); // tipo -> recuento
 
 // Utils
 function normaliseTypes(tipo) {
-  if (Array.isArray(tipo)) return tipo.filter(Boolean).map((t) => t.toLowerCase());
+  if (Array.isArray(tipo)) {
+    return tipo
+      .filter(Boolean)
+      .map((t) => t.toLowerCase());
+  }
   if (typeof tipo === "string" && tipo.trim() !== "") {
     return [tipo.trim().toLowerCase()];
   }
@@ -44,43 +48,69 @@ function hasActiveFilters() {
   return activeTypes.size > 0;
 }
 
+// Helpers para adaptar datos desde Google Sheets
+function splitPipeField(value) {
+  // Convierte un campo que viene como:
+  // ["a | b | c"]  ó  "a | b | c"
+  // en un array ["a","b","c"]
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return [];
+    return value
+      .flatMap((item) =>
+        String(item)
+          .split("|")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      );
+  }
+
+  return String(value)
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function normaliseTiposRaw(value) {
+  // En la API a veces viene como ["principal"]
+  // y otras como ["principal, guiso"]
+  if (!value) return [];
+  const arr = Array.isArray(value) ? value : [value];
+
+  return arr
+    .flatMap((item) =>
+      String(item)
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    );
+}
+
 // Carga de datos DESDE GOOGLE APPS SCRIPT
 async function loadRecipes() {
   try {
     const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbwc9sIqJ0Mr2ZJnIZnValJzyO02CGRkRjUpuHycluRW30i81ribTIh7_hrzGXBriHnH/exec",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      "https://script.google.com/macros/s/AKfycbwc9sIqJ0Mr2ZJnIZnValJzyO02CGRkRjUpuHycluRW30i81ribTIh7_hrzGXBriHnH/exec"
     );
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }
 
-    const data = await res.json();
+    const raw = await res.json();
 
-    // Intentamos adivinar dónde viene el array:
-    //  - data.recipes
-    //  - data.data
-    //  - data a secas (si ya es un array)
-    let recipes = Array.isArray(data)
-      ? data
-      : Array.isArray(data.recipes)
-      ? data.recipes
-      : Array.isArray(data.data)
-      ? data.data
-      : null;
-
-    if (!recipes) {
-      console.error("Respuesta de la API inesperada:", data);
-      throw new Error("Formato de datos no válido en la API");
-    }
-
-    allRecipes = recipes;
+    // Adaptamos el formato de la API al formato interno de la app
+    allRecipes = raw.map((r) => ({
+      titulo: r.titulo || "",
+      tipo: normaliseTiposRaw(r.tipo),
+      ingredientes: splitPipeField(r.ingredientes),
+      pasos: splitPipeField(r.pasos),
+      consejos: splitPipeField(r.consejos),
+      ruta_imagen: r.ruta_imagen || "",
+      foto: r.foto || "",
+      link: r.link || ""
+    }));
 
     // Calcular estadísticas de tipos
     typeStats = new Map();
@@ -94,11 +124,13 @@ async function loadRecipes() {
     buildFilterButtons();
     applyFilters();
   } catch (err) {
-    console.error("Error cargando recetas desde la API:", err);
-    emptyState.hidden = false;
-    emptyTitle.textContent = "Error al cargar recetas";
-    emptyMessage.textContent =
-      "No se han podido cargar los datos desde Google Sheets. Revisa el script o la conexión.";
+    console.error("Error cargando recetas desde Google Sheets:", err);
+    cardsContainer.innerHTML = `
+      <div class="error-message">
+        <h2>Error al cargar recetas</h2>
+        <p>No se han podido cargar los datos desde Google Sheets. Revisa el script o la conexión.</p>
+      </div>
+    `;
   }
 }
 
@@ -169,7 +201,7 @@ function recipeMatches(recipe) {
     const haystack = [
       recipe.titulo || "",
       ...(recipe.ingredientes || []),
-      ...(recipe.consejos || []),
+      ...(recipe.consejos || [])
     ]
       .join(" ")
       .toLowerCase();
@@ -230,11 +262,7 @@ function renderCards(recipes) {
     if (tipos.length > 0) {
       const label = tipos
         .map((t) =>
-          t === "principal"
-            ? "Principal"
-            : t === "postre"
-            ? "Postre"
-            : capitalize(t)
+          t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)
         )
         .join(" · ");
       meta.textContent = label;
@@ -264,7 +292,7 @@ function updateEmptyState(count) {
       emptyMessage.textContent =
         "Prueba a quitar filtros o a buscar otro nombre / ingrediente.";
     } else {
-      emptyMessage.textContent = "Añade recetas en tu hoja de Google Sheets.";
+      emptyMessage.textContent = "Añade recetas a tu JSON para verlas aquí.";
     }
   } else {
     emptyState.hidden = true;
@@ -302,11 +330,7 @@ function openModal(recipe) {
     modalType.hidden = false;
     modalType.textContent = tipos
       .map((t) =>
-        t === "principal"
-          ? "Principal"
-          : t === "postre"
-          ? "Postre"
-          : capitalize(t)
+        t === "principal" ? "Principal" : t === "postre" ? "Postre" : capitalize(t)
       )
       .join(" · ");
   } else {
